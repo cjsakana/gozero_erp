@@ -1,0 +1,276 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+// ------------------------------------ 
+// Messages
+// ------------------------------------ 
+
+//--------------------------------inventory--------------------------------
+message Inventory {
+  int64 inventoryId = 1; //库存ID
+  int64 productId = 2; //商品ID
+  int64 warehouseId = 3; //仓库ID
+  double currentStock = 4; //当前库存
+  double safetyStock = 5; //安全库存
+  double lockedStock = 6; //锁定库存
+}
+
+message AddInventoryReq {
+  int64 productId = 2; //商品ID
+  int64 warehouseId = 3; //仓库ID
+  double currentStock = 4; //当前库存
+  double safetyStock = 5; //安全库存
+  double lockedStock = 6; //锁定库存
+  int64 transactionType = 7;
+  int64 referenceType = 8; //业务类型： 1-采购 2-销售 3-生产
+  string referenceId = 9; //业务单号
+  int64 operatorId = 10; //操作人员ID
+  int64 batchId = 11;
+}
+
+message AddInventoryResp {
+  int64 inventoryId = 1; //库存ID
+  int64 inventoryTransactionId = 2; //流水ID
+}
+
+message UpdateInventoryReq {
+  int64 inventoryId = 1; //库存ID
+  int64 productId = 2; //商品ID
+  int64 warehouseId = 3; //仓库ID
+  double currentStock = 4; //当前库存
+  double safetyStock = 5; //安全库存
+  double lockedStock = 6; //锁定库存
+  int64 adjustType = 7;
+  int64 transactionType = 8;
+  int64 referenceType = 9; //业务类型： 1-采购 2-销售 3-生产
+  string referenceId = 10; //业务单号
+  int64 operatorId = 11; //操作人员ID
+  int64 batchId = 12; //批次ID
+}
+
+message UpdateInventoryResp {
+}
+
+message DelInventoryReq {
+  int64 id = 1; //id
+}
+
+message DelInventoryResp {
+}
+
+message GetInventoryByIdReq {
+  int64 id = 1; //id
+}
+
+message GetInventoryByIdResp {
+  Inventory inventory = 1; //inventory
+}
+
+message GetInventoryByProductIdWarehouseNoReq {
+  int64 productId = 4; //商品ID
+  int64 warehouseId = 5; //仓库ID
+}
+message GetInventoryByProductIdWarehouseNoResp {
+  Inventory inventory = 1; //inventory
+}
+
+
+message SearchInventoryReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 productId = 4; //商品ID
+  int64 warehouseId = 5; //仓库ID
+  double currentStock = 6; //当前库存
+  double safetyStock = 7; //安全库存
+  double lockedStock = 8; //锁定库存
+}
+
+message SearchInventoryResp {
+  repeated Inventory inventory = 1; //inventory
+  int64 total = 2;
+}
+
+//--------------------------------inventoryTransaction--------------------------------
+message InventoryTransaction {
+  int64 id = 1; //流水ID
+  int64 productId = 2; //商品ID
+  int64 warehouseId = 3; //仓库ID
+  int64 batchId = 4; //批次ID
+  int64 transactionType = 5; //类型: 1-in 2-out 3-盘点调整
+  double quantity = 6; //数量
+  int64 referenceType = 7; //业务类型： 1-采购 2-销售 3-生产 4-盘盈 5-盘亏
+  string referenceId = 8; //业务单号，仅12，3生产批次号
+  int64 operatorId = 9; //操作人员ID
+  int64 createdAt = 10; //交易时间
+}
+
+message AddInventoryTransactionReq {
+  int64 productId = 1; //商品ID
+  int64 warehouseId = 2; //仓库ID
+  int64 batchId = 3; //批次ID
+  int64 transactionType = 4; //类型: 1-in 2-out 3-盘点调整
+  double quantity = 5; //数量
+  int64 referenceType = 6; //业务类型： 1-采购 2-销售 3-生产 4-盘盈 5-盘亏
+  string referenceId = 7; //业务单号，仅12，3生产批次号
+  int64 operatorId = 8; //操作人员ID
+  int64 createdAt = 9; //交易时间
+}
+
+message AddInventoryTransactionResp {
+  int64 id = 1; //流水ID
+}
+
+message GetInventoryTransactionByIdReq {
+  int64 id = 1; //id
+}
+
+message GetInventoryTransactionByIdResp {
+  InventoryTransaction inventoryTransaction = 1; //inventoryTransaction
+}
+
+message SearchInventoryTransactionReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 productId = 4; //商品ID
+  int64 warehouseId = 5; //仓库ID
+  int64 batchId = 6;
+  int64 transactionType = 7; //类型: 1-in 2-out
+  int64 referenceType = 8; //业务类型： 1-采购 2-销售 3-生产
+  int64 startTime = 9; //交易时间
+  int64 endTime = 10; //交易时间
+}
+
+message SearchInventoryTransactionResp {
+  repeated InventoryTransaction inventoryTransaction = 1; //inventoryTransaction
+  int64 total = 2;
+
+}
+message LowStockAlertReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+}
+message LowStockAlertResp {
+  repeated Inventory inventory = 1; //inventoryTransaction
+  int64 total = 2;
+
+}
+
+//--------------------------------warehouse--------------------------------
+message Warehouse {
+  int64 id = 1; //仓库ID
+  string no = 2; //仓库编号
+  string name = 3; //仓库名称
+  string location = 4; //仓库位置
+  int64 managerId = 5; //仓库管理员ID
+  double capacity = 6; //仓储容量
+  int64 isActive = 7; //是否启用
+  int64 createdAt = 8; //创建时间
+  int64 createdBy = 9; //创建人ID
+  int64 updatedAt = 10; //更新时间
+  int64 updatedBy = 11; //更新人ID
+}
+message WarehouseDetail {
+  int64 id = 1; //仓库ID
+  string no = 2; //仓库编号
+  string name = 3; //仓库名称
+  string location = 4; //仓库位置
+  int64 managerId = 5; //仓库管理员ID
+  double capacity = 6; //仓储容量
+  double usedCapacity = 7; //已用容量
+  int64 isActive = 8; //是否启用
+  int64 createdAt = 9; //创建时间
+  int64 createdBy = 10; //创建人ID
+  int64 updatedAt = 11; //更新时间
+  int64 updatedBy = 12; //更新人ID
+}
+
+message AddWarehouseReq {
+  string no = 1; //仓库编号
+  string name = 2; //仓库名称
+  string location = 3; //仓库位置
+  int64 managerId = 4; //仓库管理员ID
+  double capacity = 5; //仓储容量
+  int64 isActive = 6; //是否启用
+  int64 createdBy = 7; //创建人ID
+}
+
+message AddWarehouseResp {
+  int64 id = 1; //仓库ID
+}
+
+message UpdateWarehouseReq {
+  int64 id = 1; //仓库ID
+  string name = 2; //仓库名称
+  string location = 3; //仓库位置
+  int64 managerId = 4; //仓库管理员ID
+  double capacity = 5; //仓储容量
+  int64 isActive = 6; //是否启用
+  int64 updatedBy = 7; //更新人ID
+}
+
+message UpdateWarehouseResp {
+}
+
+message DelWarehouseReq {
+  int64 id = 1; //仓库ID
+}
+
+message DelWarehouseResp {
+}
+
+message GetWarehouseByIdReq {
+  int64 id = 1; //仓库ID
+}
+
+message GetWarehouseByIdResp {
+  WarehouseDetail warehouse = 1; //warehouse
+}
+
+message SearchWarehouseReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string no = 3; //仓库编号
+  string name = 4; //仓库名称
+  string location = 5; //仓库位置
+  int64 managerId = 6; //仓库管理员ID
+  double capacity = 7; //仓储容量
+  int64 isActive = 8; //是否启用
+}
+
+message SearchWarehouseResp {
+  repeated WarehouseDetail warehouse = 1; //warehouse
+  int64 total = 2;
+}
+
+
+
+// ------------------------------------ 
+// Rpc Func
+// ------------------------------------ 
+
+service inventory{
+
+  //-----------------------inventory-----------------------
+  rpc AddInventory(AddInventoryReq) returns (AddInventoryResp);
+  rpc UpdateInventory(UpdateInventoryReq) returns (UpdateInventoryResp);
+  rpc DelInventory(DelInventoryReq) returns (DelInventoryResp);
+  rpc GetInventoryById(GetInventoryByIdReq) returns (GetInventoryByIdResp);
+  rpc GetInventoryByProductIdWarehouseNo(GetInventoryByProductIdWarehouseNoReq) returns (GetInventoryByProductIdWarehouseNoResp);
+  rpc SearchInventory(SearchInventoryReq) returns (SearchInventoryResp);
+  //-----------------------inventoryTransaction-----------------------
+  rpc AddInventoryTransaction(AddInventoryTransactionReq) returns (AddInventoryTransactionResp);
+  //  rpc UpdateInventoryTransaction(UpdateInventoryTransactionReq) returns (UpdateInventoryTransactionResp);
+  rpc GetInventoryTransactionById(GetInventoryTransactionByIdReq) returns (GetInventoryTransactionByIdResp);
+  rpc SearchInventoryTransaction(SearchInventoryTransactionReq) returns (SearchInventoryTransactionResp);
+  rpc LowStockAlert(LowStockAlertReq) returns (LowStockAlertResp);
+  //-----------------------warehouse-----------------------
+  rpc AddWarehouse(AddWarehouseReq) returns (AddWarehouseResp);
+  rpc UpdateWarehouse(UpdateWarehouseReq) returns (UpdateWarehouseResp);
+  rpc DelWarehouse(DelWarehouseReq) returns (DelWarehouseResp);
+  rpc GetWarehouseById(GetWarehouseByIdReq) returns (GetWarehouseByIdResp);
+  rpc SearchWarehouse(SearchWarehouseReq) returns (SearchWarehouseResp);
+
+}

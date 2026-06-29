@@ -1,0 +1,77 @@
+﻿-- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
+--
+-- Host: localhost    Database: erp_image
+-- ------------------------------------------------------
+-- Server version	8.0.32
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Current Database: `erp_image`
+--
+
+/*!40000 DROP DATABASE IF EXISTS `erp_image`*/;
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `erp_image` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `erp_image`;
+
+--
+-- Table structure for table `image`
+--
+
+DROP TABLE IF EXISTS `image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `image` (
+  `id` bigint NOT NULL COMMENT '图片ID',
+  `business_type` bigint NOT NULL COMMENT '业务类型 1-product',
+  `business_id` bigint NOT NULL COMMENT '业务对象ID',
+  `image_url` varchar(255) NOT NULL COMMENT '图片访问URL',
+  `image_order` int NOT NULL DEFAULT '1' COMMENT '图片排序序号，数字越小越靠前',
+  `is_main` tinyint DEFAULT '1' COMMENT '是否主图：1-是 2-否',
+  `uploaded_by` bigint NOT NULL COMMENT '上传人id',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '图片上传时间',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '图片更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_business_id` (`business_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `image`
+--
+
+LOCK TABLES `image` WRITE;
+/*!40000 ALTER TABLE `image` DISABLE KEYS */;
+INSERT INTO `image` VALUES (606290630154396598,1,1100000000000000001,'https://sakanatang.dpdns.org/02b20fc0d3e99e2e85d73771627899c2dddd1d38a086674512a7a0769a563c40.jpg',2,0,7000000000000000000,'2026-02-12 22:36:16','2026-02-26 11:59:04'),(606290630271837110,1,1100000000000000001,'https://sakanatang.dpdns.org/bc81fbf72e7430ebf6475e2373d1b6a1689e7311d29b3b9bea63782b5ce058b2.jpg',1,0,7000000000000000000,'2026-02-12 22:36:16','2026-02-26 11:59:04'),(608255886527308726,1,1100000000000000001,'https://sakanatang.dpdns.org/02b20fc0d3e99e2e85d73771627899c2dddd1d38a086674512a7a0769a563c40.jpg',1,2,7000000000000000000,'2026-02-26 11:59:20','2026-02-26 11:59:20'),(608255886560863158,1,1100000000000000001,'https://sakanatang.dpdns.org/bc81fbf72e7430ebf6475e2373d1b6a1689e7311d29b3b9bea63782b5ce058b2.jpg',2,2,7000000000000000000,'2026-02-26 11:59:20','2026-02-26 11:59:20'),(608255886594417590,1,1100000000000000001,'https://sakanatang.dpdns.org/2b72b438bb29baf506942bab921c302ce77453cfd4306a2ab38983f336159619.jpg',3,2,7000000000000000000,'2026-02-26 11:59:20','2026-02-26 11:59:20');
+/*!40000 ALTER TABLE `image` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping events for database 'erp_image'
+--
+
+--
+-- Dumping routines for database 'erp_image'
+--
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-04-10 21:53:56

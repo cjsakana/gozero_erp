@@ -1,0 +1,253 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+// ------------------------------------ 
+// Messages
+// ------------------------------------ 
+
+//--------------------------------salesDelivery--------------------------------
+message SalesDelivery {
+  int64 id = 1; //出库单ID
+  string deliveryNo = 2; //出库单号
+  int64 orderId = 3; //销售订单ID
+  int64 warehouseId = 4; //出库仓库ID
+  int64 deliveryDate = 5; //出库日期
+  double totalQuantity = 6; //总数量
+  double totalAmount = 7; //总金额
+  int64 status = 8; //状态：1-已出库
+  int64 createdBy = 9; //操作人ID
+  int64 createdAt = 10; //createdAt
+  string orderNo = 11; //销售订单No
+}
+
+message SalesDeliveryDetail {
+  int64 id = 1; //id
+  int64 deliveryId = 2; //出库单ID
+  int64 productId = 3; //商品ID
+  string productName = 4; //商品名称
+  string unit = 5; //计量单位
+  double quantity = 6; //出库数量
+  double unitPrice = 7; //单价
+  double amount = 8; //金额
+  int64 batchId = 9; //批次ID
+}
+
+message DeliveryWithDetails{
+  SalesDelivery salesDelivery = 1;
+  int64 total = 2;
+  repeated SalesDeliveryDetail salesDeliveryDetail = 3; //salesDeliveryDetail
+}
+
+message DeliveryDetailItem{
+  int64 productId = 2; //商品ID
+  string productName = 3; //商品名称
+  string unit = 4; //计量单位
+  double quantity = 5; //出库数量
+  double unitPrice = 6; //单价
+  double amount = 7; //金额
+  int64 batchId = 9; //批次ID
+}
+
+message AddSalesDeliveryReq {
+  string deliveryNo = 1; //出库单号
+  int64 orderId = 2; //销售订单ID
+  int64 warehouseId = 3; //出库仓库ID
+  int64 deliveryDate = 4; //出库日期
+  double totalQuantity = 5; //总数量
+  double totalAmount = 6; //总金额
+  int64 createdBy = 7; //创建人（员工ID）
+  repeated DeliveryDetailItem details = 9;
+}
+
+message AddSalesDeliveryResp {
+  int64 id = 1; //出库单ID
+}
+
+// 批量
+message OutboundDetailItem{
+  int64 id = 1; //id
+  double quantity = 2;
+  int64 batchId = 3; //批次ID
+}
+message OutboundReq {
+  int64 id = 1; //出库单ID
+  int64 createdBy = 2; //操作人ID
+  repeated OutboundDetailItem items = 3;
+}
+
+message OutboundResp {
+}
+
+// 单次
+message UpdateSalesDeliveryDetailReq {
+  int64 id = 1; //明细ID
+  int64 deliveryId = 2; //出库单ID
+  int64 productId = 3; //商品ID
+  string productName = 4; //商品名称
+  string unit = 5; //计量单位
+  double quantity = 6; //出库数量
+  double unitPrice = 7; //单价
+  double amount = 8; //金额
+  int64 batchId = 9; //批次ID
+}
+
+message UpdateSalesDeliveryDetailResp {
+}
+
+message GetSalesDeliveryByIdReq {
+  int64 id = 1; //id
+}
+
+message GetSalesDeliveryByIdResp {
+  DeliveryWithDetails deliveryWithDetails = 1;
+}
+
+
+
+message SearchSalesDeliveryReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string deliveryNo = 4; //出库单号
+  int64 orderId = 5; //销售订单ID
+  int64 warehouseId = 6; //出库仓库ID
+  int64 deliveryDate = 7; //出库日期
+  int64 status = 10; //状态：1-已出库
+}
+
+message SearchSalesDeliveryResp {
+  int64 total = 1;
+  repeated DeliveryWithDetails DeliveryWithDetails = 2;
+}
+
+service salesDelivery{
+  //-----------------------salesDelivery-----------------------
+  rpc AddSalesDelivery(AddSalesDeliveryReq) returns (AddSalesDeliveryResp);
+  rpc Outbound(OutboundReq) returns (OutboundResp);
+  rpc UpdateSalesDeliveryDetail(UpdateSalesDeliveryDetailReq) returns (UpdateSalesDeliveryDetailResp);
+  rpc GetSalesDeliveryById(GetSalesDeliveryByIdReq) returns (GetSalesDeliveryByIdResp);
+  rpc SearchSalesDelivery(SearchSalesDeliveryReq) returns (SearchSalesDeliveryResp);
+}
+
+
+//--------------------------------salesOrder--------------------------------
+message SalesOrder {
+  int64 id = 1; //销售订单ID
+  string orderNo = 2; //销售订单号
+  int64 customerId = 3; //客户ID
+  int64 orderDate = 4; //订单日期
+  int64 promisedDate = 5; //承诺交货日期
+  double totalAmount = 6; //订单总金额
+  int64 status = 7; //状态： 1-已确认 2-部分发货 3-已完成 4-已取消
+  int64 salesmanId = 8; //销售员ID
+  string contractUrl = 9; //合同URL
+  int64 createdAt = 10; //createdAt
+}
+
+message SalesOrderDetail {
+  int64 id = 1; //id
+  int64 orderId = 2; //销售订单ID
+  int64 productId = 3; //商品ID
+  string productName = 4; //商品名称
+  string unit = 5; //计量单位
+  double quantity = 6; //销售数量
+  double unitPrice = 7; //销售单价
+  double amount = 8; //金额
+  double deliveredQty = 9; //已发货数量
+  string remark = 10; //备注
+}
+
+
+message OrderWithDetails{
+  SalesOrder salesOrder=1;
+  int64 total = 2;
+  repeated SalesOrderDetail salesOrderDetail = 3; //salesOrderDetail
+}
+
+
+message SalesOrderDetailItem{
+  int64 productId = 2; //商品ID
+  string productName = 3; //商品名称
+  string unit = 4; //计量单位
+  double quantity = 5; //销售数量
+  double unitPrice = 6; //销售单价
+  double amount = 7; //金额
+  double deliveredQty = 8; //已发货数量
+  string remark = 9; //备注
+}
+
+message AddSalesOrderReq {
+  string orderNo = 1; //销售订单号
+  int64 customerId = 2; //客户ID
+  int64 orderDate = 3; //订单日期
+  int64 promisedDate = 4; //承诺交货日期
+  double totalAmount = 5; //订单总金额
+  int64 status = 6; //状态：1-已确认 2-部分发货 3-已完成 4-已取消
+  int64 salesmanId = 7; //销售员ID
+  string contractUrl = 8; //合同URL
+  repeated SalesOrderDetailItem details = 9;
+}
+
+message AddSalesOrderResp {
+  int64 id = 1; //销售订单ID
+}
+
+//message UpdateSalesOrderStatusReq {
+//  int64 id = 1; //销售订单ID
+//  int64 status = 7; //状态：0-草稿 1-已确认 2-部分发货 3-已完成 4-已取消
+//}
+//
+//message UpdateSalesOrderStatusResp {
+//}
+//
+//message UpdateSalesOrderContractReq{
+//  int64 id = 1; //销售订单ID
+//  string url = 2;
+//}
+//message UpdateSalesOrderContractResp{
+//}
+
+
+message UpdateSalesOrderReq{
+  int64 id = 1; //销售订单ID
+  int64 status = 7; //状态： 1-已确认 2-部分发货 3-已完成 4-已取消
+  string contractUrl = 9; //合同URL
+}
+message UpdateSalesOrderResp{
+}
+
+message GetSalesOrderByIdReq {
+  int64 id = 1; //id
+}
+
+message GetSalesOrderByIdResp {
+  OrderWithDetails orderWithDetails=1;
+}
+
+message SearchSalesOrderReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string orderNo = 4; //销售订单号
+  int64 customerId = 5; //客户ID
+  //  int64 orderDate = 6; //订单日期
+  int64 status = 9; //状态：1-已确认 2-部分发货 3-已完成 4-已取消
+  int64 salesmanId = 10; //销售员ID
+  int64 startOrderDate = 11;
+  int64 endOrderDate = 12;
+}
+
+message SearchSalesOrderResp {
+  repeated OrderWithDetails orderWithDetails=1;
+  int64 total = 2;
+}
+
+service salesOrder {
+
+  //-----------------------salesOrder-----------------------
+  rpc AddSalesOrder(AddSalesOrderReq) returns (AddSalesOrderResp);
+  rpc UpdateSalesOrder(UpdateSalesOrderReq) returns (UpdateSalesOrderResp);
+  rpc GetSalesOrderById(GetSalesOrderByIdReq) returns (GetSalesOrderByIdResp);
+  rpc SearchSalesOrder(SearchSalesOrderReq) returns (SearchSalesOrderResp);
+}

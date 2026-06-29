@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+// ------------------------------------ 
+// Messages
+// ------------------------------------ 
+
+//--------------------------------user--------------------------------
+message User {
+  int64 id = 1; //用户ID
+  int64 employeeId = 2; //员工ID
+  string employeeNo = 3; //员工No
+  string username = 4; //用户名
+  string realName = 5; //真实姓名
+  string phone = 6; //手机号
+  string email = 7; // 邮箱
+  string avatar = 8; //头像
+  bool resigned = 9; //已离职
+  int64 createdBy = 10; //创建人ID
+  int64 createdAt = 11; //创建时间（时间戳）
+  int64 updatedAt = 12; //更新时间（时间戳）
+  int64 updatedBy = 13; //更新人ID
+}
+message BulkInsertUser {
+  int64 employeeId = 1; //员工ID
+  string employeeNo = 2; //员工No
+  string username = 3; //用户名
+  string realName = 4; //真实姓名
+  string password = 5; //密码(未加密
+  string phone = 6; //手机号
+  string email = 7; // 邮箱
+  int64 createdBy = 8; //创建人ID
+}
+
+message BulkInsertUserReq {
+  repeated BulkInsertUser users = 1;
+}
+
+message BulkInsertUserResp {
+// 这个批操作要搭配bulkEmployeeDetail使用，那里已经返回了
+  // 采用了 dtm 的 msg，会重试直到完成
+}
+
+message AddUserReq{
+  int64 employeeId = 1; //员工ID
+  string employeeNo = 2; //员工No
+  string username = 3; //用户名
+  string realName = 4; //真实姓名
+  string password = 5; //密码(未加密)
+  string phone = 6; //手机号
+  string email = 7; // 邮箱
+  int64 createdBy = 8; //创建人ID
+}
+message AddUserResp{
+  int64 id = 1; //用户ID
+}
+
+message UpdateUserReq {
+  int64 id = 1; //用户ID
+  string username = 2; //用户名
+  string realName = 3; //真实姓名
+  string phone = 5; //手机号
+  string email = 6; // 邮箱
+  string avatar = 7; //头像
+  bool resigned = 8; //已离职
+  int64 updatedBy = 9; //更新人ID
+}
+
+message UpdateUserResp {
+}
+
+//message DelUserReq {
+//  int64 id = 1; //id
+//}
+//
+//message DelUserResp {
+//}
+
+
+message GetUserByIdReq {
+  int64 id = 1; //id
+}
+
+message GetUserByIdResp {
+  User user = 1; //user
+}
+
+message GetUserByEmployeeIdReq {
+  int64 employeeId = 1; //employeeId
+}
+
+message GetUserByEmployeeIdResp {
+  User user = 1; //user
+}
+
+message SearchUserReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 employeeId = 3; //员工ID
+  string username = 4; //用户名
+  string realName = 5; //真实姓名
+  string phone = 6; //手机号
+  string email = 7; //邮箱
+  optional bool resigned = 8; //是否离职（可选，用于筛选）
+}
+
+message SearchUserResp {
+  int64 total = 1;
+  repeated User users = 2; //user
+}
+message LoginReq{
+  string employeeNo = 1;
+  string password = 2;
+}
+message LoginResp{
+  int64 id = 1;
+}
+
+message UpdatePasswordReq{
+  int64 id = 1;
+  string oldPassword = 2;
+  string newPassword = 3;
+}
+message UpdatePasswordResp{
+}
+
+message ForgotPasswordReq{
+  string phone = 1;
+  string password = 2;
+}
+message ForgotPasswordResp{
+}
+
+
+// ------------------------------------ 
+// Rpc Func
+// ------------------------------------ 
+
+service user{
+
+  //-----------------------user-----------------------
+  rpc AddUser(AddUserReq) returns (AddUserResp);
+  rpc BulkInsertUser(BulkInsertUserReq) returns (BulkInsertUserResp);
+  rpc UpdateUser(UpdateUserReq) returns (UpdateUserResp);
+
+  // 已废弃：补偿由 Msg 实现。原说明：Saga 补偿：将用户状态回滚（与正向同请求体，约定 resigned=0 表示未离职）
+//  rpc CompensateUpdateUser(UpdateUserReq) returns (UpdateUserResp);
+//  rpc DelUser(DelUserReq) returns (DelUserResp);
+  // 已废弃：补偿由 Msg 实现。原说明：Saga 补偿：根据 AddUserReq 中的 employeeNo 删除用户
+//  rpc CompensateAddUser(AddUserReq) returns (DelUserResp);
+
+  rpc GetUserById(GetUserByIdReq) returns (GetUserByIdResp);
+  rpc GetUserByEmployeeId(GetUserByEmployeeIdReq) returns (GetUserByEmployeeIdResp);
+  rpc SearchUser(SearchUserReq) returns (SearchUserResp);
+  rpc Login(LoginReq) returns (LoginResp);
+  rpc UpdatePassword(UpdatePasswordReq) returns (UpdatePasswordResp);
+  rpc ForgotPassword(ForgotPasswordReq) returns (ForgotPasswordResp);
+}

@@ -1,0 +1,29 @@
+# 库存服务RPC配置
+Name: inventory.rpc
+ListenOn: 0.0.0.0:9009
+
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: inventory.rpc
+
+Log:
+  ServiceName: inventory-rpc
+  Mode: file
+  Path: logs
+  Level: info
+  KeepDays: 7
+
+MySQL:
+  DataSource: root:123456@tcp(127.0.0.1:3306)/erp_inventory?charset=utf8mb4&parseTime=True&loc=Local
+
+Redis:
+  Host: 127.0.0.1:6379
+  Type: node
+  Pass: ""
+
+ProductRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: product.rpc

@@ -1,0 +1,274 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+// ------------------------------------ 
+// Messages
+// ------------------------------------ 
+
+//--------------------------------customer--------------------------------
+message Customer {
+  int64 id = 1; //客户ID
+  string code = 2; //客户编码
+  string uscc = 3; //统一社会信用代码
+  string name = 4; //客户名称
+  int64 categoryId = 5; //客户分类
+  string contact = 6; //联系人
+  string phone = 7; //联系电话
+  string address = 8; //地址
+  double creditLimit = 9; //信用额度
+  double usedCredit = 10; //已用额度
+  string paymentTerms = 11; //付款条件
+  int64 isActive = 12; //是否合作中: 1-合作 2-待合作
+  int64 createdAt = 13; //创建时间
+  int64 createdBy = 14; //创建人ID
+  int64 updatedAt = 15; //更新时间
+  int64 updatedBy = 16; //更新人ID
+}
+
+message AddCustomerReq {
+  string code = 1; //客户编码
+  string uscc = 2; //统一社会信用代码
+  string name = 3; //客户名称
+  int64 categoryId = 4; //客户分类
+  string contact = 5; //联系人
+  string phone = 6; //联系电话
+  string address = 7; //地址
+  double creditLimit = 8; //信用额度
+  double usedCredit = 9; //已用额度
+  string paymentTerms = 10; //付款条件
+  int64 isActive = 11; //是否合作中: 1-合作 2-待合作
+  int64 createdBy = 13; //创建人ID
+}
+
+message AddCustomerResp {
+  int64 id = 1; //客户ID
+}
+
+message UpdateCustomerReq {
+  int64 id = 1; //客户ID
+  string name = 3; //客户名称
+  int64 categoryId = 4; //客户分类
+  string contact = 5; //联系人
+  string phone = 6; //联系电话
+  string address = 7; //地址
+  double creditLimit = 8; //信用额度
+  double usedCredit = 9; //已用额度
+  string paymentTerms = 10; //付款条件
+  int64 isActive = 11; //是否合作中: 1-合作 2-不合作
+  int64 updatedBy = 12; //更新人ID
+}
+
+message UpdateCustomerResp {
+}
+
+
+message GetCustomerByIdReq {
+  int64 id = 1; //id
+}
+
+message GetCustomerByIdResp {
+  Customer customer = 1; //customer
+}
+
+message GetCustomerByCodeReq {
+  string code = 1; //客户编码
+}
+
+message GetCustomerByCodeResp {
+  Customer customer = 1; //customer
+}
+
+
+message SearchCustomerReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string code = 3;//客户编码
+  string uscc = 4; //统一社会信用代码
+  string name = 5; //客户名称
+  int64 categoryId = 6; //客户分类
+  string contact = 7; //联系人
+  string address = 9; //地址
+  string paymentTerms = 12; //付款条件
+  int64 isActive = 13; //是否合作中: 1-合作 2-不合作
+}
+
+message SearchCustomerResp {
+  repeated Customer customer = 1; //customer
+  int64 total=2;
+
+}
+
+//--------------------------------customerCategory--------------------------------
+message CustomerCategory {
+  int64 id = 1; //客户分类ID
+  string name = 2; //分类名称
+  string creditPolicy = 3; //信用政策
+  int64 createdBy = 4; //创建人ID
+  int64 createdAt = 5; //创建时间
+}
+
+message AddCustomerCategoryReq {
+  string name = 1; //分类名称
+  string creditPolicy = 2; //信用政策
+  int64 createdBy=3;
+}
+
+message AddCustomerCategoryResp {
+  int64 id = 1; //客户分类ID
+}
+
+message UpdateCustomerCategoryReq {
+  int64 id = 1; //客户分类ID
+  string name = 2; //分类名称
+  string creditPolicy = 3; //信用政策
+}
+
+message UpdateCustomerCategoryResp {
+}
+
+message DelCustomerCategoryReq {
+  int64 id = 1; //id
+}
+
+message DelCustomerCategoryResp {
+}
+
+message GetCustomerCategoryByIdReq {
+  int64 id = 1; //id
+}
+
+message GetCustomerCategoryByIdResp {
+  CustomerCategory customerCategory = 1; //customerCategory
+}
+
+message SearchCustomerCategoryReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 id = 3; //客户分类ID
+  string name = 4; //分类名称
+  string creditPolicy = 5; //信用政策
+}
+
+message SearchCustomerCategoryResp {
+  repeated CustomerCategory customerCategory = 1; //customerCategory
+  int64 total=2;
+
+}
+
+//--------------------------------customerSatisfactionSurvey--------------------------------
+message CustomerSatisfactionSurvey {
+  int64 id = 1; //调查ID
+  int64 customerId = 2; //客户ID
+  double qualityScore = 3; //质量评分
+  double deliveryScore = 4; //交付评分
+  double serviceScore = 5; //服务评分
+  double overallScore = 6; //综合评分
+  string remark = 7; //评价
+  int64 createdAt = 8; //调查日期
+  int64 createdBy = 9; //创建人ID
+}
+
+message AddCustomerSatisfactionSurveyReq {
+  int64 customerId = 1; //客户ID
+  double qualityScore = 2; //质量评分
+  double deliveryScore = 3; //交付评分
+  double serviceScore = 4; //服务评分
+  double overallScore = 5; //综合评分
+  string remark = 7; //评价
+  int64 createdBy = 8; //创建人ID
+}
+
+message AddCustomerSatisfactionSurveyResp {
+  int64 id = 1; //调查ID
+}
+
+//message UpdateCustomerSatisfactionSurveyReq {
+//  int64 id = 1; //调查ID
+//  int64 customerId = 2; //客户ID
+//  double qualityScore = 3; //质量评分
+//  double deliveryScore = 4; //交付评分
+//  double serviceScore = 5; //服务评分
+//  double overallScore = 6; //综合评分
+//  string remark = 8; //评价
+//  int64 createdAt = 9; //调查日期
+//}
+//
+//message UpdateCustomerSatisfactionSurveyResp {
+//}
+
+//message DelCustomerSatisfactionSurveyReq {
+//  int64 id = 1; //id
+//}
+//
+//message DelCustomerSatisfactionSurveyResp {
+//}
+
+message GetCustomerSatisfactionSurveyByIdReq {
+  int64 id = 1; //id
+}
+
+message GetCustomerSatisfactionSurveyByIdResp {
+  CustomerSatisfactionSurvey customerSatisfactionSurvey = 1; //customerSatisfactionSurvey
+}
+
+message SearchCustomerSatisfactionSurveyReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 customerId = 3; //客户ID
+
+  double qualityMin = 4; //质量评分
+  double qualityMax = 5; //质量评分
+  string qualityOp = 6; //质量评分操作符: gt/gte/eq/lt/lte
+
+  double deliveryMin = 7; //交付评分
+  double deliveryMax = 8; //交付评分
+  string deliveryOp = 9;
+
+  double serviceMin = 10; //服务评分
+  double serviceMax = 11; //服务评分
+  string serviceOp = 12;
+
+  double overallMin = 13; //综合评分
+  double overallMax = 14; //综合评分
+  string overallOp = 15;
+
+  int64 startDate = 16;
+  int64 endDate = 17;
+}
+
+message SearchCustomerSatisfactionSurveyResp {
+  repeated CustomerSatisfactionSurvey customerSatisfactionSurvey = 1; //customerSatisfactionSurvey
+  int64 total=2;
+}
+
+
+// ------------------------------------ 
+// Rpc Func
+// ------------------------------------ 
+
+service customer{
+
+  //-----------------------customer-----------------------
+  rpc AddCustomer(AddCustomerReq) returns (AddCustomerResp);
+  rpc UpdateCustomer(UpdateCustomerReq) returns (UpdateCustomerResp);
+//  rpc DelCustomer(DelCustomerReq) returns (DelCustomerResp);
+  rpc GetCustomerById(GetCustomerByIdReq) returns (GetCustomerByIdResp);
+  rpc GetCustomerByCode(GetCustomerByCodeReq) returns (GetCustomerByCodeResp);
+  rpc SearchCustomer(SearchCustomerReq) returns (SearchCustomerResp);
+  //-----------------------customerCategory-----------------------
+  rpc AddCustomerCategory(AddCustomerCategoryReq) returns (AddCustomerCategoryResp);
+  rpc UpdateCustomerCategory(UpdateCustomerCategoryReq) returns (UpdateCustomerCategoryResp);
+  rpc DelCustomerCategory(DelCustomerCategoryReq) returns (DelCustomerCategoryResp);
+  rpc GetCustomerCategoryById(GetCustomerCategoryByIdReq) returns (GetCustomerCategoryByIdResp);
+  rpc SearchCustomerCategory(SearchCustomerCategoryReq) returns (SearchCustomerCategoryResp);
+  //-----------------------customerSatisfactionSurvey-----------------------
+  rpc AddCustomerSatisfactionSurvey(AddCustomerSatisfactionSurveyReq) returns (AddCustomerSatisfactionSurveyResp);
+//  rpc UpdateCustomerSatisfactionSurvey(UpdateCustomerSatisfactionSurveyReq) returns (UpdateCustomerSatisfactionSurveyResp);
+//  rpc DelCustomerSatisfactionSurvey(DelCustomerSatisfactionSurveyReq) returns (DelCustomerSatisfactionSurveyResp);
+  rpc GetCustomerSatisfactionSurveyById(GetCustomerSatisfactionSurveyByIdReq) returns (GetCustomerSatisfactionSurveyByIdResp);
+  rpc SearchCustomerSatisfactionSurvey(SearchCustomerSatisfactionSurveyReq) returns (SearchCustomerSatisfactionSurveyResp);
+
+}

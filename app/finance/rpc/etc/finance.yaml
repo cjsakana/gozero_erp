@@ -1,0 +1,27 @@
+Name: finance.rpc
+ListenOn: 0.0.0.0:9030
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: finance.rpc
+
+DataSource: root:123456@tcp(127.0.0.1:3306)/erp_finance?parseTime=true&loc=Asia%2FShanghai
+CacheRedis:
+  - Host: 127.0.0.1:6379
+    Pass:
+    Type: node
+BizRedis:
+  Host: 127.0.0.1:6379
+  Pass:
+  Type: node
+
+# DTM 分布式事务管理器
+DtmServer: 127.0.0.1:36790
+
+# HR RPC 配置（用于薪资发放后回调）
+HrRPC:
+  Etcd:
+    Hosts:
+    - 127.0.0.1:2379
+    Key: hr.rpc
+  NonBlock: true

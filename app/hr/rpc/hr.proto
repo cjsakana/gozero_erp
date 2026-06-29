@@ -1,0 +1,753 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+//--------------------------------考勤记录表--------------------------------
+message AttendanceRecord {
+  int64 id = 1; //主键ID
+  int64 employeeId = 2; //员工ID
+  int64 date = 3; //日期（时间戳，秒）
+  int64 clockIn = 4; //上班打卡时间（时间戳，秒，0表示未打卡）
+  int64 clockOut = 5; //下班打卡时间（时间戳，秒，0表示未打卡）
+  bool isAmMissing = 6; //是否缺上午卡
+  bool isLate = 7; //是否迟到
+  bool isPmMissing = 8; //是否缺下午卡
+  bool isEarlyLeave = 9; //是否早退
+  double workHours = 10; //实际工作时长(小时)
+  double overtimeHours = 11; //加班时长(小时)
+  string remark = 12; //备注
+}
+
+message ClockReq{
+  int64 employeeId = 1;//员工ID
+  int64 clockTime = 2; //打卡时间
+}
+message ClockResp{
+}
+
+//message AddAttendanceRecordReq {
+//  int64 employeeId=1;//员工ID
+//  int64 clockIn = 2; //上班打卡
+//  int64 clockOut = 3; //下班打卡
+//}
+//
+//message AddAttendanceRecordResp {
+//}
+//
+//message UpdateAttendanceRecordReq {
+//  int64 employeeId=1;//员工ID
+//  int64 clockOut = 2; //下班打卡
+//  double workHours = 3; //实际工作时长(小时)
+//  double overtimeHours = 4; //加班时长(小时)
+//  string remark = 6; //备注
+//}
+//message UpdateAttendanceRecordResp {
+//}
+
+message AttendanceCheckerReq{}
+message AttendanceCheckerResp{}
+
+
+message GetAttendanceRecordByIdReq {
+  int64 id = 1; //id
+}
+
+message GetAttendanceRecordByIdResp {
+  AttendanceRecord attendanceRecord = 1; //attendanceRecord
+}
+
+message SearchAttendanceRecordReq {
+  int64 page = 1; //页码
+  int64 limit = 2; //每页数量
+  int64 employeeId = 3; //员工ID（可选）
+  int64 startDate = 4; //开始日期（时间戳，秒，可选）
+  int64 endDate = 5; //结束日期（时间戳，秒，可选）
+  optional bool isLate = 6; //筛选迟到记录（可选）
+  optional bool isEarlyLeave = 7; //筛选早退记录（可选）
+  optional bool isAmMissing = 8; //筛选缺上午卡记录（可选）
+  optional bool isPmMissing = 9; //筛选缺下午卡记录（可选）
+  string remark = 10; //备注关键词（模糊查询，可选）
+}
+
+message SearchAttendanceRecordResp {
+  int64 total = 1;
+  repeated AttendanceRecord attendanceRecord = 2; //attendanceRecord
+}
+
+//--------------------------------补卡申请表--------------------------------
+message AttendanceReplenish {
+  int64 id = 1; //id
+  int64 employeeId = 2;//申请人ID
+  int64 originalDate = 3; //需补卡的日期
+  int64 applyTime = 4; //申请时间
+  int64 replenishType = 5; //补卡类型：1-补上班 2-补下班 3-补全天
+  int64 replenishTime = 6; //补卡时间（实际打卡时间）
+  string reason = 7; //补卡原因
+  string evidence = 8; //证明材料URL
+  int64 status = 9; //状态：0-待审批 1-已通过 2-已拒绝
+  int64 approverId = 10; //审批人ID
+  int64 approveTime = 11; //审批时间
+  string approveRemark = 12; //审批意见
+}
+
+message AddAttendanceReplenishReq {
+  int64 employeeId = 1;//申请人ID
+  int64 originalDate = 2; //需补卡的日期
+  int64 replenishType = 4; //补卡类型：1-补上班 2-补下班 3-补全天
+  int64 replenishTime = 5; //补卡时间（实际打卡时间）
+  string reason = 6; //补卡原因
+  string evidence = 7; //证明材料URL
+  int64 approverId = 10; //审批人ID
+}
+
+message AddAttendanceReplenishResp {
+  int64 id = 1; //id
+}
+
+message UpdateAttendanceReplenishReq {
+  int64 id = 1; //id
+  int64 originalDate = 3; //需补卡的日期
+  int64 replenishType = 5; //补卡类型：1-补上班 2-补下班 3-补全天
+  int64 replenishTime = 6; //补卡时间（实际打卡时间）
+  string reason = 7; //补卡原因
+  string evidence = 8; //证明材料URL
+  int64 status = 9; //状态：0-待审批 1-已通过 2-已拒绝
+  int64 approverId = 10; //审批人ID
+  int64 approveTime = 11; //审批时间
+  string approveRemark = 12; //审批意见
+}
+
+message UpdateAttendanceReplenishResp {
+}
+
+message GetAttendanceReplenishByIdReq {
+  int64 id = 1; //id
+}
+
+message GetAttendanceReplenishByIdResp {
+  AttendanceReplenish attendanceReplenish = 1; //attendanceReplenish
+}
+
+message SearchAttendanceReplenishReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 employeeId = 3;//申请人ID
+  int64 replenishType = 4; //补卡类型：1-补上班 2-补下班 3-补全天
+  string reason = 5; //补卡原因
+  int64 status = 6; //状态：0-待审批 1-已通过 2-已拒绝
+  int64 approverId = 7; //审批人IDID
+}
+
+message SearchAttendanceReplenishResp {
+  int64 total = 1;
+  repeated AttendanceReplenish attendanceReplenish = 2; //attendanceReplenish
+}
+
+//--------------------------------部门表--------------------------------
+message Department {
+  int64 id = 1; //id
+  string name = 2; //部门名称
+  int64 parentId = 3; //父部门ID
+  string code = 4; //部门编码
+  int64 managerId = 5; //部门负责人id
+  string managerNo = 6; //部门负责人no
+  string managerName = 7; //负责人姓名
+  int64 createdAt = 8; //createdAt
+  int64 updatedAt = 9; //updatedAt
+}
+
+message AddDepartmentReq {
+  string name = 1; //部门名称
+  int64 parentId = 2; //父部门ID
+  string code = 3; //部门编码
+  int64 managerId = 4; //部门负责人id
+  string managerNo = 5; //部门负责人no
+  string managerName = 6; //负责人姓名
+}
+
+message AddDepartmentResp {
+  int64 id = 1; //id
+}
+
+//message AddDepartmentItem{
+//  string name = 1; //部门名称
+//  int64 parentId = 2; //父部门ID
+//  string code = 3; //部门编码
+//  string managerId = 4; //部门负责人id
+//  string managerNo = 5; //部门负责人no
+//  string managerName = 6; //负责人姓名
+//}
+//message BulkAddDepartmentReq {
+//  repeated AddDepartmentItem departments = 1;
+//}
+//message BulkAddDepartmentItem {
+//  int64 index = 1;  // excel中第几条
+//  string error = 2;
+//}
+//
+//message BulkAddDepartmentResp {
+//  int64 successCount = 1;
+//  int64 errorCount = 2;
+//  repeated BulkAddDepartmentItem items=3;
+//}
+
+message UpdateDepartmentReq {
+  int64 id = 1; //id
+  string name = 2; //部门名称
+  int64 parentId = 3; //父部门ID
+  string code = 4; //部门编码
+  int64 managerId = 5; //部门负责人id
+  string managerNo = 6; //部门负责人no
+  string managerName = 7; //负责人姓名
+}
+
+message UpdateDepartmentResp {
+}
+
+message DelDepartmentReq {
+  int64 id = 1; //id
+}
+
+message DelDepartmentResp {
+}
+
+message GetDepartmentByIdReq {
+  int64 id = 1; //id
+}
+
+message GetDepartmentByIdResp {
+  Department department = 1; //department
+}
+
+message SearchDepartmentReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string name = 4; //部门名称
+  int64 parentId = 5; //父部门ID
+  string code = 6; //部门编码
+//  string managerNo = 7; //部门负责人
+//  string managerName = 8; //负责人姓名
+}
+
+message SearchDepartmentResp {
+  int64 total = 1;
+  repeated Department department = 2; //department
+}
+
+//--------------------------------员工信息扩展表--------------------------------
+message EmployeeDetail {
+  int64 id = 1; //员工ID
+  string employeeNo = 2; //员工NO
+  string name = 3; // 真实姓名
+  string idCard = 4; //身份证号
+  string account = 5; //银行卡号
+  int64 gender = 6; //性别：1-男 2-女
+  int64 birthDate = 7; //出生日期
+  int64 departmentId = 8; //所属部门
+  int64 positionId = 9; //职位
+  double salary = 10; //基本工资
+  int64 hireDate = 11; //入职日期
+  int64 leaveDate = 12; //离职日期
+}
+
+message AddEmployeeDetailItem{
+  int64 id = 1; //员工ID
+  string employeeNo = 2; //员工NO
+  string name = 3; // 真实姓名
+  string idCard = 4; //身份证号
+  string account = 5; //银行卡号
+  int64 gender = 6; //性别：1-男 2-女
+  int64 departmentId = 8; //所属部门
+  int64 positionId = 9; //职位
+  double salary = 10; //基本工资
+  int64 hireDate = 11; //入职日期
+}
+
+message AddEmployeeDetailReq {
+  AddEmployeeDetailItem employeeDetail = 1;
+}
+
+message AddEmployeeDetailResp {
+  int64 id=1;
+}
+
+message BulkAddEmployeeDetailReq {
+  repeated AddEmployeeDetailItem employeeDetails = 1;
+}
+
+message BulkAddEmployeeDetailErrItem {
+  int64 index = 1;  // excel中第几条
+  string error = 2;
+}
+
+message BulkAddEmployeeDetailResp {
+  int64 successCount = 1;
+  int64 errorCount = 2;
+  repeated BulkAddEmployeeDetailErrItem items = 3;
+}
+
+
+message UpdateEmployeeDetailReq {
+  int64 id = 1; //员工ID
+  string name = 2; // 真实姓名
+  string account = 3; //银行卡号
+  int64 departmentId = 4; //所属部门
+  int64 positionId = 5; //职位
+  double salary = 6; //基本工资
+  int64 hireDate = 7; //入职日期
+  int64 leaveDate = 8; //离职日期
+}
+
+message UpdateEmployeeDetailResp {
+}
+
+message DelEmployeeDetailReq {
+  int64 id = 1; // 员工ID
+}
+
+message DelEmployeeDetailResp {
+}
+
+message EmployeeNonSensitiveDetail {
+  int64 id = 1; //员工ID
+  string employeeNo = 2; //员工工号
+  string name = 3; // 真实姓名
+  int64 gender = 4; //性别：1-男 2-女
+  int64 birthDate = 5; //出生日期
+  int64 departmentId = 6; //所属部门
+  int64 positionId = 7; //职位
+  double salary = 8; //基本工资
+  int64 hireDate = 9; //入职日期
+  int64 leaveDate = 10; //离职日期
+}
+
+message GetEmployeeDetailByIdReq {
+  int64 id = 1;
+}
+
+message GetEmployeeDetailByIdResp {
+  EmployeeNonSensitiveDetail employeeNonSensitiveDetail = 1;
+}
+
+message GetEmployeeDetailByEmployeeNoReq {
+  string employeeNo = 1; //员工工号
+}
+
+message GetEmployeeDetailByEmployeeNoResp {
+  EmployeeNonSensitiveDetail employeeNonSensitiveDetail = 1;
+}
+
+message SearchEmployeeDetailReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 gender = 6; //性别：1-男 2-女
+  int64 departmentId = 8; //所属部门
+  int64 positionId = 9; //职位
+  double salary = 10; //基本工资
+  int64 hireDate = 11; //入职日期
+  string name = 12; // 真实姓名
+  int64 resigned = 13;// 是否离职
+}
+
+message SearchEmployeeDetailResp {
+  int64 total = 1;
+  repeated EmployeeNonSensitiveDetail employeeNonSensitiveDetail = 2;
+}
+
+
+//--------------------------------请假申请表--------------------------------
+message LeaveApplication {
+  int64 id = 1; //id
+  int64 employeeId = 2; //申请人
+  int64 type = 3; //类型：1-年假 2-病假 3-事假
+  int64 startTime = 4; //开始时间
+  int64 endTime = 5; //结束时间
+  double duration = 6; //时长(天)
+  string reason = 7; //请假原因
+  string evidence = 8; //证明材料URL
+  int64 status = 9; //状态：0-审批中 1-已通过 2-已拒绝
+  int64 approverId = 10; //审批人ID
+  int64 approveTime = 11; //审批时间
+  string approveRemark = 12; //审批意见
+  int64 createdAt = 13; //createdAt
+}
+
+message AddLeaveApplicationReq {
+  int64 employeeId = 1; //申请人
+  int64 type = 2; //类型：1-年假 2-病假 3-事假
+  int64 startTime = 3; //开始时间
+  int64 endTime = 4; //结束时间
+  string reason = 6; //请假原因
+  string evidence = 7; //证明材料URL
+  int64 approverId = 8; //审批人ID
+}
+
+message AddLeaveApplicationResp {
+  int64 id = 1; //id
+}
+
+message UpdateLeaveApplicationReq {
+  int64 id = 1; //id
+  int64 type = 3; //类型：1-年假 2-病假 3-事假
+  int64 startTime = 4; //开始时间
+  int64 endTime = 5; //结束时间
+  string reason = 7; //请假原因
+  string evidence = 8; //证明材料URL
+  int64 status = 9; //状态：1-审批中 2-已通过 3-已拒绝
+  int64 approverId = 10; //审批人ID
+  int64 approveTime = 11; //审批时间
+  string approveRemark = 12; //审批意见
+}
+
+message UpdateLeaveApplicationResp {
+}
+
+
+message GetLeaveApplicationByIdReq {
+  int64 id = 1; //id
+}
+
+message GetLeaveApplicationByIdResp {
+  LeaveApplication leaveApplication = 1; //leaveApplication
+}
+
+message SearchLeaveApplicationReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 employeeId = 4; //申请人
+  int64 type = 5; //类型：1-年假 2-病假 3-事假
+  int64 startTime = 6; //开始时间
+  int64 endTime = 7; //结束时间
+  string reason = 8; //请假原因
+  int64 status = 9; //状态：0-审批中 1-已通过 2-已拒绝
+  int64 approverId = 10; //审批人ID
+}
+
+message SearchLeaveApplicationResp {
+  int64 total = 1;
+  repeated LeaveApplication leaveApplication = 2; //leaveApplication
+}
+
+//--------------------------------payrollRecord--------------------------------
+message PayrollRecord {
+  int64 id = 1; //薪酬ID
+  int64 employeeId = 2; //员工ID
+  int64 paymentMonth =3 ; //薪资月份(如2025-06-01表示6月)
+  double baseSalary = 4; //基本工资
+  double bonus = 5; //奖金
+  double deductions = 6; //扣款
+  double netSalary = 7; //实发工资
+  int64 calculatedBy = 8; //核算人ID
+  int64 calculatedAt = 9; //核算日期时间
+  int64 status = 10; //薪酬状态：0-未核算，1-已核算，2-已提交，3-待发放，4-已发放，5-发放失败
+  string description = 11; //描述/备注
+  int64 paymentAt = 12; //发放日期
+  int64 createdAt = 13; //创建时间
+}
+
+message AddPayrollRecordReq {
+  int64 employeeId = 1; //员工ID
+  int64 paymentMonth =2 ; //薪资月份(如2025-06-01表示6月)
+  double bonus = 3; //奖金
+  double deductions = 4; //扣款
+  string description = 5; //描述/备注
+  int64 calculatedBy = 8; //核算人ID
+  int64 calculatedAt = 9; //核算日期时间
+}
+message AddPayrollRecordResp {
+  int64 id = 1; //薪酬ID
+}
+
+message AddPayrollRecordItem{
+  int64 employeeId = 1; //员工ID
+  int64 paymentMonth =2 ; //薪资月份(如2025-06-01表示6月)
+  double bonus = 3; //奖金
+  double deductions = 4; //扣款
+  string description = 5; //描述/备注
+  int64 calculatedBy = 8; //核算人ID
+  int64 calculatedAt = 9; //核算日期时间
+}
+
+
+message BulkAddPayrollRecordReq {
+  repeated AddPayrollRecordItem payrollRecords = 1;
+}
+
+message BulkAddPayrollRecordErrItem {
+  int64 employeeId = 1; //员工ID
+  string error = 2;
+}
+
+message BulkAddPayrollRecordResp {
+  int64 successCount = 1;
+  int64 errorCount = 2;
+  repeated BulkAddPayrollRecordErrItem items = 3;
+}
+
+message UpdatePayrollRecordReq {
+  int64 id = 1; //薪酬ID
+  double bonus = 4; //奖金
+  double deductions = 5; //扣款
+  int64 calculatedBy = 7; //核算人ID
+  int64 calculatedAt = 8; //核算日期时间
+  int64 status = 9; //薪酬状态：0-未核算，1-已核算，2-已提交，3-待发放，4-已发放，5-发放失败
+  string description = 10; //描述/备注
+  int64 paymentAt = 11; //发放日期
+}
+
+message UpdatePayrollRecordResp {
+}
+
+//message DelPayrollRecordReq {
+//  int64 id = 1; //id
+//}
+
+//message DelPayrollRecordResp {
+//}
+//
+message GetPayrollRecordByIdReq {
+  int64 id = 1; //id
+}
+
+message GetPayrollRecordByIdResp {
+  PayrollRecord payrollRecord = 1; //payrollRecord
+}
+
+message SearchPayrollRecordReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 paymentMonth =3 ; //薪资月份(如2025-06-01表示6月)
+  int64 employeeId = 4; //员工no
+  int64 status = 6; //状态：1-未发放, 2-待发放, 3-已发放, 4-发放失败
+  string description = 7; //描述/备注
+  int64 calculatedBy = 9; //核算人ID
+  int64 startCalculatedDate = 10; //核算日期时间
+  int64 endCalculatedDate = 11; //核算日期时间
+  int64 startPaymentDate = 12;
+  int64 endPaymentDate = 13;
+}
+
+message SearchPayrollRecordResp {
+  int64 total = 1;
+  repeated PayrollRecord payrollRecord = 2; //payrollRecord
+}
+
+// ------------------------------
+// 按月生成工资
+// ------------------------------
+message GenerateMonthlyPayrollReq {
+  int64 year = 1;   // 目标年份，未传或为0则取上月的年份
+  int64 month = 2;  // 目标月份(1-12)，未传或为0则取上月月份
+  bool overwrite = 3; // 是否覆盖已存在的该期工资（未实现 period 字段时将以近似幂等策略处理）
+}
+
+message GenerateMonthlyPayrollResp {
+  int64 successCount = 1;
+  int64 failCount = 2;
+  repeated int64 failedEmployeeIds = 3;
+}
+
+//--------------------------------岗位表--------------------------------
+message Position {
+  int64 id = 1; //id
+  string name = 2; //岗位名称
+  string description = 3; //岗位描述
+}
+
+message AddPositionReq {
+  string name = 1; //岗位名称
+  string description = 2; //岗位描述
+}
+
+message AddPositionResp {
+  int64 id = 1; //id
+}
+
+message UpdatePositionReq {
+  int64 id = 1; //id
+  string name = 2; //岗位名称
+  string description = 3; //岗位描述
+}
+message UpdatePositionResp {
+}
+
+message DelPositionReq {
+  int64 id = 1; //id
+}
+
+message DelPositionResp {
+}
+
+message GetPositionByIdReq {
+  int64 id = 1; //id
+}
+
+message GetPositionByIdResp {
+  Position position = 1; //position
+}
+
+message SearchPositionReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string name = 4; //岗位名称
+  string description = 5; //岗位描述
+}
+
+message SearchPositionResp {
+  int64 total = 1;
+  repeated Position position = 2; //position
+}
+
+
+//--------------------------------离职申请表--------------------------------
+message ResignedApplication {
+  int64 id = 1; //id
+  int64 employeeId = 2; //申请人
+  string reason = 3; //申请原因
+  int64 leaveDate = 4; //离职日期
+  string evidence = 5; //证明材料URL
+  int64 status = 6; //状态：0-审批中 1-已通过 2-已拒绝
+  int64 approverId = 7; //审批人IDID
+  int64 approveTime = 8; //审批时间
+  string approveRemark = 9; //审批意见
+  int64 createdAt = 10; //createdAt
+}
+
+message AddResignedApplicationReq {
+  int64 employeeId = 1; //申请人
+  string reason = 2; //申请原因
+  int64 leaveDate = 3; //离职日期
+  string evidence = 4; //证明材料URL
+  int64 approverId = 7; //审批人IDID
+}
+
+message AddResignedApplicationResp {
+  int64 id = 1; //id
+}
+
+message UpdateResignedApplicationReq {
+  int64 id = 1; //id
+  string reason = 3; //申请原因
+  int64 leaveDate = 4; //离职日期
+  string evidence = 5; //证明材料URL
+  int64 status = 6; //状态：0-审批中 1-已通过 2-已拒绝
+  int64 approverId = 7; //审批人IDID
+  int64 approveTime = 8; //审批时间
+  string approveRemark = 9; //审批意见
+}
+
+message UpdateResignedApplicationResp {
+}
+
+message GetResignedApplicationByIdReq {
+  int64 id = 1; //id
+}
+
+message GetResignedApplicationByIdResp {
+  ResignedApplication resignedApplication = 1; //resignedApplication
+}
+
+
+message SearchResignedApplicationReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 employeeId = 4; //申请人ID
+  int64 startLeaveDate = 6; //离职日期
+  int64 endLeaveDate = 7; //离职日期
+  int64 status = 8; //状态：0-审批中 1-已通过 2-已拒绝
+  int64 approverId = 9; //审批人ID
+}
+
+message SearchResignedApplicationResp {
+  int64 total = 1;
+  repeated ResignedApplication resignedApplication = 2; //resignedApplication
+}
+
+
+// ------------------------------------ 
+// Rpc Func
+// ------------------------------------ 
+
+service attendanceRecord{
+
+  //-----------------------考勤记录表-----------------------
+  rpc Clock(ClockReq)returns(ClockResp);
+  //  rpc AddAttendanceRecord(AddAttendanceRecordReq) returns (AddAttendanceRecordResp);
+  //  rpc UpdateAttendanceRecord(UpdateAttendanceRecordReq) returns (UpdateAttendanceRecordResp);
+  rpc AttendanceChecker (AttendanceCheckerReq)returns(AttendanceCheckerResp);
+  rpc GetAttendanceRecordById(GetAttendanceRecordByIdReq) returns (GetAttendanceRecordByIdResp);
+  rpc SearchAttendanceRecord(SearchAttendanceRecordReq) returns (SearchAttendanceRecordResp);
+}
+
+service attendanceReplenish{
+  //-----------------------补卡申请表-----------------------
+  rpc AddAttendanceReplenish(AddAttendanceReplenishReq) returns (AddAttendanceReplenishResp);
+  rpc UpdateAttendanceReplenish(UpdateAttendanceReplenishReq) returns (UpdateAttendanceReplenishResp);
+  rpc GetAttendanceReplenishById(GetAttendanceReplenishByIdReq) returns (GetAttendanceReplenishByIdResp);
+  rpc SearchAttendanceReplenish(SearchAttendanceReplenishReq) returns (SearchAttendanceReplenishResp);
+}
+
+service department{
+
+  //-----------------------部门表-----------------------
+  rpc AddDepartment(AddDepartmentReq) returns (AddDepartmentResp);
+//  rpc BulkAddDepartment(BulkAddDepartmentReq) returns (BulkAddDepartmentResp);
+  rpc UpdateDepartment(UpdateDepartmentReq) returns (UpdateDepartmentResp);
+  rpc DelDepartment(DelDepartmentReq) returns (DelDepartmentResp);
+  rpc GetDepartmentById(GetDepartmentByIdReq) returns (GetDepartmentByIdResp);
+  rpc SearchDepartment(SearchDepartmentReq) returns (SearchDepartmentResp);
+}
+
+service employeeDetail{
+  //-----------------------员工信息扩展表-----------------------
+  rpc AddEmployeeDetail(AddEmployeeDetailReq) returns (AddEmployeeDetailResp);
+  // 已废弃：补偿由 Msg 实现。原说明：Saga 补偿：删除新增的员工扩展信息，入参与 AddEmployeeDetailReq 相同
+//  rpc CompensateAddEmployeeDetail(AddEmployeeDetailReq) returns (DelEmployeeDetailResp);
+  rpc BulkAddEmployeeDetail(BulkAddEmployeeDetailReq) returns (BulkAddEmployeeDetailResp);
+  rpc UpdateEmployeeDetail(UpdateEmployeeDetailReq) returns (UpdateEmployeeDetailResp);
+  // 已废弃：补偿由 Msg 实现。原说明：Saga 补偿：将离职日期回滚为未离职（与正向同请求体，约定 leaveDate=0 表示清空）
+//  rpc CompensateUpdateEmployeeDetail(UpdateEmployeeDetailReq) returns (UpdateEmployeeDetailResp);
+  rpc DelEmployeeDetail(DelEmployeeDetailReq) returns (DelEmployeeDetailResp);
+  rpc GetEmployeeDetailByEmployeeNo(GetEmployeeDetailByEmployeeNoReq) returns (GetEmployeeDetailByEmployeeNoResp);
+  rpc GetEmployeeDetailById(GetEmployeeDetailByIdReq) returns (GetEmployeeDetailByIdResp);
+  rpc SearchEmployeeDetail(SearchEmployeeDetailReq) returns (SearchEmployeeDetailResp);
+}
+
+service leaveApplication{
+  //-----------------------请假申请表-----------------------
+  rpc AddLeaveApplication(AddLeaveApplicationReq) returns (AddLeaveApplicationResp);
+  rpc UpdateLeaveApplication(UpdateLeaveApplicationReq) returns (UpdateLeaveApplicationResp);
+  rpc GetLeaveApplicationById(GetLeaveApplicationByIdReq) returns (GetLeaveApplicationByIdResp);
+  rpc SearchLeaveApplication(SearchLeaveApplicationReq) returns (SearchLeaveApplicationResp);
+}
+
+service payrollRecord{
+  //-----------------------payrollRecord-----------------------
+  rpc AddPayrollRecord(AddPayrollRecordReq) returns (AddPayrollRecordResp);
+  rpc BulkAddPayrollRecord(BulkAddPayrollRecordReq) returns (BulkAddPayrollRecordResp);
+  rpc UpdatePayrollRecord(UpdatePayrollRecordReq) returns (UpdatePayrollRecordResp);
+  //  rpc DelPayrollRecord(DelPayrollRecordReq) returns (DelPayrollRecordResp);
+  rpc GetPayrollRecordById(GetPayrollRecordByIdReq) returns (GetPayrollRecordByIdResp);
+  rpc SearchPayrollRecord(SearchPayrollRecordReq) returns (SearchPayrollRecordResp);
+  // 新增：按月份批量生成工资单
+  rpc GenerateMonthlyPayroll(GenerateMonthlyPayrollReq) returns (GenerateMonthlyPayrollResp);
+}
+
+service position{
+  //-----------------------岗位表-----------------------
+  rpc AddPosition(AddPositionReq) returns (AddPositionResp);
+  rpc UpdatePosition(UpdatePositionReq) returns (UpdatePositionResp);
+  rpc DelPosition(DelPositionReq) returns (DelPositionResp);
+  rpc GetPositionById(GetPositionByIdReq) returns (GetPositionByIdResp);
+  rpc SearchPosition(SearchPositionReq) returns (SearchPositionResp);
+}
+
+service resignedApplication{
+  //-----------------------离职申请表-----------------------
+  rpc AddResignedApplication(AddResignedApplicationReq) returns (AddResignedApplicationResp);
+  rpc UpdateResignedApplication(UpdateResignedApplicationReq) returns (UpdateResignedApplicationResp);
+  rpc GetResignedApplicationById(GetResignedApplicationByIdReq) returns (GetResignedApplicationByIdResp);
+  rpc SearchResignedApplication(SearchResignedApplicationReq) returns (SearchResignedApplicationResp);
+}

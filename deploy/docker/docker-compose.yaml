@@ -1,0 +1,527 @@
+version: "3.8"
+
+# ERP系统Docker部署配置
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: erp-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../sql:/docker-entrypoint-initdb.d
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: erp-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # Etcd服务注册
+  etcd:
+    image: bitnami/etcd:3.5
+    container_name: erp-etcd
+    restart: always
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+
+  # ========== 微服务 API ==========
+
+  # --- auth-api (8001) ---
+  auth-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.auth-api
+    container_name: erp-auth-api
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+
+  # --- user-api (8002) ---
+  user-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.user-api
+    container_name: erp-user-api
+    restart: always
+    ports:
+      - "8002:8002"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - user-rpc
+
+  # --- hr-api (8003) ---
+  hr-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.hr-api
+    container_name: erp-hr-api
+    restart: always
+    ports:
+      - "8003:8003"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - hr-rpc
+      - user-rpc
+      - dtm
+
+  # --- product-api (8004) ---
+  product-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.product-api
+    container_name: erp-product-api
+    restart: always
+    ports:
+      - "8004:8004"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - product-rpc
+      - inventory-rpc
+      - hr-rpc
+
+  # --- inventory-api (8005) ---
+  inventory-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.inventory-api
+    container_name: erp-inventory-api
+    restart: always
+    ports:
+      - "8005:8005"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - inventory-rpc
+      - product-rpc
+      - hr-rpc
+      - user-rpc
+
+  # --- supplier-api (8006) ---
+  supplier-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.supplier-api
+    container_name: erp-supplier-api
+    restart: always
+    ports:
+      - "8006:8006"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - supplier-rpc
+      - hr-rpc
+
+  # --- customer-api (8007) ---
+  customer-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.customer-api
+    container_name: erp-customer-api
+    restart: always
+    ports:
+      - "8007:8007"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - customer-rpc
+      - hr-rpc
+
+  # --- sale-api (8008) ---
+  sale-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.sale-api
+    container_name: erp-sale-api
+    restart: always
+    ports:
+      - "8008:8008"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - sale-rpc
+      - hr-rpc
+      - inventory-rpc
+      - product-rpc
+      - customer-rpc
+
+  # --- purchase-api (8009) ---
+  purchase-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.purchase-api
+    container_name: erp-purchase-api
+    restart: always
+    ports:
+      - "8009:8009"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - purchase-rpc
+      - hr-rpc
+      - supplier-rpc
+      - inventory-rpc
+      - product-rpc
+
+  # --- finance-api (8010) ---
+  finance-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.finance-api
+    container_name: erp-finance-api
+    restart: always
+    ports:
+      - "8010:8010"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - finance-rpc
+      - user-rpc
+      - hr-rpc
+      - customer-rpc
+      - supplier-rpc
+
+  # --- image-api (8011) ---
+  image-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.image-api
+    container_name: erp-image-api
+    restart: always
+    ports:
+      - "8011:8011"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - image-rpc
+
+  # --- production-api (8020) ---
+  production-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.production-api
+    container_name: erp-production-api
+    restart: always
+    ports:
+      - "8020:8020"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - auth-rpc
+      - production-rpc
+      - hr-rpc
+      - inventory-rpc
+      - product-rpc
+
+  # ========== 微服务 RPC ==========
+
+  # --- auth-rpc (9001) ---
+  auth-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.auth-rpc
+    container_name: erp-auth-rpc
+    restart: always
+    expose:
+      - "9001"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+
+  # --- user-rpc (9002) ---
+  user-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.user-rpc
+    container_name: erp-user-rpc
+    restart: always
+    expose:
+      - "9002"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+
+  # --- hr-rpc (9003) ---
+  hr-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.hr-rpc
+    container_name: erp-hr-rpc
+    restart: always
+    expose:
+      - "9003"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - user-rpc
+
+  # --- product-rpc (9004) ---
+  product-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.product-rpc
+    container_name: erp-product-rpc
+    restart: always
+    expose:
+      - "9004"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+
+  # --- supplier-rpc (9006) ---
+  supplier-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.supplier-rpc
+    container_name: erp-supplier-rpc
+    restart: always
+    expose:
+      - "9006"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+
+  # --- customer-rpc (9007) ---
+  customer-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.customer-rpc
+    container_name: erp-customer-rpc
+    restart: always
+    expose:
+      - "9007"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+
+  # --- sale-rpc (9008) ---
+  sale-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.sale-rpc
+    container_name: erp-sale-rpc
+    restart: always
+    expose:
+      - "9008"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+
+  # --- inventory-rpc (9009) ---
+  inventory-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.inventory-rpc
+    container_name: erp-inventory-rpc
+    restart: always
+    expose:
+      - "9009"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - product-rpc
+
+  # --- purchase-rpc (9019 映射到容器内9009) ---
+  purchase-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.purchase-rpc
+    container_name: erp-purchase-rpc
+    restart: always
+    expose:
+      - "9009"
+    ports:
+      - "9019:9009"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+
+  # --- image-rpc (9011) ---
+  image-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.image-rpc
+    container_name: erp-image-rpc
+    restart: always
+    expose:
+      - "9011"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+
+  # --- production-rpc (9020) ---
+  production-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.production-rpc
+    container_name: erp-production-rpc
+    restart: always
+    expose:
+      - "9020"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+
+  # --- finance-rpc (9030) ---
+  finance-rpc:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/Dockerfile.finance-rpc
+    container_name: erp-finance-rpc
+    restart: always
+    expose:
+      - "9030"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+      - hr-rpc
+
+  # ========== DTM 分布式事务管理器 ==========
+  dtm:
+    image: yedf/dtm
+    container_name: erp-dtm
+    restart: always
+    ports:
+      - "36789:36789"
+      - "36790:36790"
+    environment:
+      - STORE_DRIVER=mysql
+      - STORE_HOST=mysql
+      - STORE_PORT=3306
+      - STORE_USER=root
+      - STORE_PASSWORD=123456
+    depends_on:
+      - mysql
+
+  # ========== Nginx 网关 ==========
+  nginx:
+    image: nginx:alpine
+    container_name: erp-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx/conf.d:/etc/nginx/conf.d
+      - ../ca:/etc/nginx/ssl
+    depends_on:
+      - auth-api
+      - user-api
+      - hr-api
+      - product-api
+      - inventory-api
+      - supplier-api
+      - customer-api
+      - sale-api
+      - purchase-api
+      - finance-api
+      - image-api
+      - production-api
+
+volumes:
+  mysql_data:
+  redis_data:

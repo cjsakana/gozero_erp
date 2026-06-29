@@ -1,0 +1,37 @@
+Name: image-api
+Host: 0.0.0.0
+Port: 8011
+MaxBytes: 104857600 # 100MB
+Timeout: 30000 # 超时时间设置为30秒（单位：毫秒）
+
+Etcd:
+  Key: rpcServer
+  Hosts:
+    - "127.0.0.1:2379"
+
+Auth:
+  AccessSecret: qsHUADZu9izXb8-rRl8SeSuZBYdoO
+  # 20分钟
+  #  AccessExpire: 1200
+  AccessExpire: 604800
+AuthRPC:
+  Etcd:
+    Key: auth.rpc
+  NonBlock: true
+
+ImageRPC:
+  Etcd:
+    Key: image.rpc
+  NonBlock: true
+
+BizRedis:
+  Host: 127.0.0.1:6379
+  Pass:
+  Type: node
+
+R2Conf:
+  AccessKeyId:
+  AccessKeySecret:
+  Endpoint:
+  BucketName:
+  Domain:

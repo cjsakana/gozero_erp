@@ -1,0 +1,216 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+// ------------------------------------ 
+// Messages
+// ------------------------------------ 
+
+//--------------------------------product--------------------------------
+message Product {
+  int64 id = 1; //商品ID
+  string productNo = 2; //商品编码
+  string productName = 3; //商品名称
+  int64 categoryId = 4; //商品分类
+  string specifications = 5; //规格型号
+  string unit = 6; //计量单位
+  double purchasePrice = 7; //采购价格
+  double sellingPrice = 8; //零售价格
+  int64 isActive = 9; //是否启用: 1-启用 2-不启用
+  int64 createdAt = 10; //创建时间
+  int64 createdBy = 11; //创建人ID
+  int64 updatedAt = 12; //更新时间
+  int64 updatedBy = 13; //更新人ID
+  int64 isMaterial =14; // 是否为物料: 1-是物料(用于生产) 2-非物料(成品)
+}
+
+message AddProductReq {
+//  string productNo = 1; //商品编码
+  string productName = 2; //商品名称
+  int64 categoryId = 3; //商品分类
+  string specifications = 4; //规格型号
+  string unit = 5; //计量单位
+  double purchasePrice = 6; //采购价格
+  double sellingPrice = 7; //零售价格
+  int64 isActive = 8; //是否启用
+  int64 createdBy = 9; //创建人ID
+  int64 isMaterial =10; // 是否为物料: 1-是物料(用于生产) 2-非物料(成品)
+}
+
+message AddProductResp {
+  int64 id = 1;
+}
+
+message UpdateProductReq {
+  int64 id = 1;
+  string productName = 2; //商品名称
+  int64 categoryId = 3; //商品分类
+  string specifications = 4; //规格型号
+  string unit = 5; //计量单位
+  double purchasePrice = 6; //采购价格
+  double sellingPrice = 7; //零售价格
+  int64 isActive = 8; //是否启用
+  int64 updatedBy = 9; //更新人ID
+  int64 isMaterial =10; // 是否为物料: 1-是物料(用于生产) 2-非物料(成品)
+}
+
+message UpdateProductResp {
+}
+
+//message DelProductReq {
+//  int64 id = 1;
+//}
+//
+//message DelProductResp {
+//}
+
+message GetProductByIdReq {
+  int64 id = 1;
+}
+
+message GetProductByIdResp {
+  Product product = 1; //product
+}
+
+message GetProductByNoReq {
+  string productNo = 1;
+}
+
+message GetProductByNoResp {
+  Product product = 1; //product
+}
+
+message SearchProductReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string productNo = 3; //商品编码
+  string productName = 4; //商品名称
+  int64 categoryId = 5; //商品分类
+  int64 isActive = 6; //是否启用
+  int64 isMaterial =7; // 是否为物料: 1-是物料(用于生产) 2-非物料(成品)
+}
+
+message SearchProductResp {
+  int64 total = 1;
+  repeated Product product = 2; //product
+}
+service product{
+  //-----------------------product-----------------------
+  rpc AddProduct(AddProductReq) returns (AddProductResp);
+  rpc UpdateProduct(UpdateProductReq) returns (UpdateProductResp);
+//  rpc DelProduct(DelProductReq) returns (DelProductResp);
+  rpc GetProductByNo(GetProductByNoReq) returns (GetProductByNoResp);
+  rpc GetProductById(GetProductByIdReq) returns (GetProductByIdResp);
+  rpc SearchProduct(SearchProductReq) returns (SearchProductResp);
+}
+
+//--------------------------------productBatch--------------------------------
+message ProductBatch {
+  int64 id = 1; //批次ID
+  int64 productId = 2; //商品ID
+  string batchNo = 3; //批次号
+  int64 productionDate = 4; //生产日期
+  int64 createdAt = 5; //创建时间
+}
+
+message AddProductBatchReq {
+  int64 productId = 1; //商品ID
+  string batchNo = 2; //批次号
+  int64 productionDate = 3; //生产日期
+}
+
+message AddProductBatchResp {
+  int64 id = 1; //批次ID
+}
+
+message GetProductBatchByIdReq {
+  int64 id = 1; //id
+}
+
+message GetProductBatchByIdResp {
+  ProductBatch productBatch = 1; //productBatch
+}
+
+message SearchProductBatchReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 productId = 3; //商品ID
+  string batchNo = 4; //批次号
+  int64 startDate = 5;
+  int64 endDate = 6;
+}
+
+message SearchProductBatchResp {
+  repeated ProductBatch productBatch = 1; //productBatch
+  int64 total = 2;
+}
+
+service productBatch {
+  rpc AddProductBatch(AddProductBatchReq) returns (AddProductBatchResp);
+  rpc GetProductBatchById(GetProductBatchByIdReq) returns (GetProductBatchByIdResp);
+  rpc SearchProductBatch(SearchProductBatchReq) returns (SearchProductBatchResp);
+}
+
+//--------------------------------productCategory--------------------------------
+message ProductCategory {
+  int64 categoryId = 1; //分类ID
+  string categoryName = 2; //分类名称
+  int64 parentId = 3; //父级分类
+}
+
+message AddProductCategoryReq {
+  string categoryName = 2; //分类名称
+  int64 parentId = 3; //父级分类
+}
+
+message AddProductCategoryResp {
+  int64 categoryId = 1; //分类ID
+}
+
+message UpdateProductCategoryReq {
+  int64 categoryId = 1; //分类ID
+  string categoryName = 2; //分类名称
+  int64 parentId = 3; //父级分类
+}
+
+message UpdateProductCategoryResp {
+}
+
+message DelProductCategoryReq {
+  int64 id = 1; //id
+}
+
+message DelProductCategoryResp {
+}
+
+message GetProductCategoryByIdReq {
+  int64 id = 1; //id
+}
+
+message GetProductCategoryByIdResp {
+  ProductCategory productCategory = 1; //productCategory
+}
+
+message SearchProductCategoryReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 categoryId = 3; //分类ID
+  string categoryName = 4; //分类名称
+  int64 parentId = 5; //父级分类
+}
+
+message SearchProductCategoryResp {
+  int64 total = 1;
+  repeated ProductCategory productCategory = 2; //productCategory
+}
+
+service productCategory{
+  //-----------------------productCategory-----------------------
+  rpc AddProductCategory(AddProductCategoryReq) returns (AddProductCategoryResp);
+  rpc UpdateProductCategory(UpdateProductCategoryReq) returns (UpdateProductCategoryResp);
+  rpc DelProductCategory(DelProductCategoryReq) returns (DelProductCategoryResp);
+  rpc GetProductCategoryById(GetProductCategoryByIdReq) returns (GetProductCategoryByIdResp);
+  rpc SearchProductCategory(SearchProductCategoryReq) returns (SearchProductCategoryResp);
+}

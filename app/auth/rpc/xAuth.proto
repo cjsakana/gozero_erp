@@ -1,0 +1,322 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+
+//--------------------------------permission--------------------------------
+message Permission {
+  int64 id = 1; //主键ID，雪花
+  int64 parentId = 2; //父级权限ID。0：根节点
+  string code = 3; //权限代码
+  string description = 4; //权限描述/名称
+  string url = 5; //url
+  string method = 6; //method
+}
+//
+//message AddPermissionReq {
+//  int64 parentId = 1; //父级权限ID。0：根节点
+//  string code = 2; //权限代码
+//  string description = 3; //权限描述/名称
+//  string url = 4; //url
+//  string method = 5; //method
+//}
+//
+//message AddPermissionResp {
+//}
+//
+//message UpdatePermissionReq {
+//  int64 id = 1; //主键ID，雪花
+//  int64 parentId = 2; //父级权限ID。0：根节点
+//  string code = 3; //权限代码
+//  string description = 4; //权限描述/名称
+//  string url = 5; //url
+//  string method = 6; //method
+//}
+//
+//message UpdatePermissionResp {
+//}
+//
+//message DelPermissionReq {
+//  int64 id = 1; //id
+//}
+//
+//message DelPermissionResp {
+//}
+//
+//message GetPermissionByIdReq {
+//  int64 id = 1; //id
+//}
+//
+//message GetPermissionByIdResp {
+//  Permission permission = 1; //permission
+//}
+//
+//message SearchPermissionReq {
+//  int64 page = 1; //page
+//  int64 limit = 2; //limit
+//  int64 id = 3; //主键ID，雪花
+//  int64 parentId = 4; //父级权限ID。0：根节点
+//  string code = 5; //权限代码
+//  string description = 6; //权限描述/名称
+//  string url = 7; //url
+//  string method = 8; //method
+//}
+//
+//message SearchPermissionResp {
+//  repeated Permission permission = 1; //permission
+//}
+
+message PermissionItem {
+  int64 id = 1; //主键ID，雪花
+  int64 parentId = 2; //父级权限ID。0：根节点
+  string code = 3; //权限代码
+  string description = 4; //权限描述/名称
+  string url = 5; //url
+  string method = 6; //method
+  repeated PermissionItem child = 7; // 子权限
+}
+
+message GetAllPermissionsReq{}
+
+message GetAllPermissionsResp{
+  int64 total = 1;
+  repeated PermissionItem permissions = 2;
+}
+
+service permission {
+  //-----------------------permission-----------------------
+  //  rpc AddPermission(AddPermissionReq) returns (AddPermissionResp);
+  //  rpc UpdatePermission(UpdatePermissionReq) returns (UpdatePermissionResp);
+  //  rpc DelPermission(DelPermissionReq) returns (DelPermissionResp);
+  //  rpc GetPermissionById(GetPermissionByIdReq) returns (GetPermissionByIdResp);
+  //  rpc SearchPermission(SearchPermissionReq) returns (SearchPermissionResp);
+  rpc GetAllPermissions(GetAllPermissionsReq) returns (GetAllPermissionsResp);
+}
+
+//--------------------------------role--------------------------------
+message Role {
+  int64 id = 1; //id
+  string code = 2; //角色代码
+  string name = 3; //角色名称
+  string description = 4; //角色描述
+}
+
+message AddRoleReq {
+  string code = 1; //角色代码
+  string name = 2; //角色名称
+  string description = 3; //角色描述
+}
+
+message AddRoleResp {
+  int64 id = 1; //id
+}
+
+message UpdateRoleReq {
+  int64 id = 1; //id
+  string code = 2; //角色代码
+  string name = 3; //角色名称
+  string description = 4; //角色描述
+}
+
+message UpdateRoleResp {
+}
+
+message DelRoleReq {
+  int64 id = 1; //id
+}
+
+message DelRoleResp {
+}
+
+message GetRoleByIdReq {
+  int64 id = 1; //id
+}
+
+message GetRoleByIdResp {
+  Role role = 1; //role
+}
+
+message SearchRoleReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string code = 3; //角色代码
+  string name = 4; //角色名称
+  string description = 5; //角色描述
+}
+
+message SearchRoleResp {
+  int64 total=1;
+  repeated Role roles = 2; //role
+}
+
+service role{
+  //-----------------------role-----------------------
+  rpc AddRole(AddRoleReq) returns (AddRoleResp);
+  rpc UpdateRole(UpdateRoleReq) returns (UpdateRoleResp);
+  rpc DelRole(DelRoleReq) returns (DelRoleResp);
+  rpc GetRoleById(GetRoleByIdReq) returns (GetRoleByIdResp);
+  rpc SearchRole(SearchRoleReq) returns (SearchRoleResp);
+}
+
+//--------------------------------rolePermission--------------------------------
+message RolePermission {
+  int64 id = 1; //id
+  int64 roleId = 2; //roleId
+  int64 permissionId = 3; //permissionId
+}
+
+message AddRolePermissionReq {
+  int64 roleId = 1; //roleId
+  int64 permissionId = 2; //permissionId
+}
+
+message AddRolePermissionResp {
+  int64 id = 1; //id
+}
+
+message UpdateRolePermissionReq {
+  int64 id = 1; //id
+  int64 roleId = 2; //roleId
+  int64 permissionId = 3; //permissionId
+}
+
+message UpdateRolePermissionResp {
+}
+
+message DelRolePermissionReq {
+  int64 id = 1; //id
+}
+
+message DelRolePermissionResp {
+}
+
+message RoleAndPermissionDetails{
+  Role role = 1;
+  int64 total = 2;
+  repeated Permission permissions = 3;
+}
+
+// 包含role_permission_id的权限信息
+message PermissionWithRolePermissionId {
+  int64 rolePermissionId = 1; //role_permission表的主键ID
+  int64 permissionId = 2; //权限ID
+  int64 parentId = 3; //父级权限ID。0：根节点
+  string code = 4; //权限代码
+  string description = 5; //权限描述/名称
+  string url = 6; //url
+  string method = 7; //method
+}
+
+message RoleAndPermissions {
+  Role role = 1;
+  int64 total = 2;
+  repeated PermissionWithRolePermissionId permissions = 3;
+}
+
+// 单个
+message GetRolePermissionByRoleIdReq {
+  int64 roleId = 1; //roleId
+}
+
+message GetRolePermissionByRoleIdResp {
+  RoleAndPermissions rolePermissions = 1;
+}
+
+// 多个
+message SearchRolePermissionReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string code = 3; //角色代码
+  string name = 4; //角色名称
+  string description = 5; //角色描述
+}
+
+
+message SearchRolePermissionResp {
+  int64 total = 1;
+  repeated  RoleAndPermissions rolePermissions = 2;
+}
+
+
+service rolePermission{
+  //-----------------------rolePermission-----------------------
+  rpc AddRolePermission(AddRolePermissionReq) returns (AddRolePermissionResp);
+  rpc DelRolePermission(DelRolePermissionReq) returns (DelRolePermissionResp);
+  rpc GetRolePermissionByRoleId(GetRolePermissionByRoleIdReq) returns (GetRolePermissionByRoleIdResp);
+  rpc SearchRolePermission(SearchRolePermissionReq) returns (SearchRolePermissionResp);
+}
+
+//--------------------------------userRole--------------------------------
+message UserRole {
+  int64 id = 1; //id
+  int64 userId = 2; //userId
+  int64 roleId = 3; //roleId
+}
+
+message AddUserRoleReq {
+  int64 userId = 1; //userId
+  int64 roleId = 2; //roleId
+}
+
+message AddUserRoleResp {
+  int64 id = 1; //id
+}
+
+message UpdateUserRoleReq {
+  int64 id = 1; //id
+  int64 userId = 2; //userId
+  int64 roleId = 3; //roleId
+}
+
+message UpdateUserRoleResp {
+}
+
+message DelUserRoleReq {
+  int64 id = 1; //id
+}
+
+message DelUserRoleResp {
+}
+
+// 便于分布式事务：基于 userId的删除
+message DelUserRoleByUserIdReq {
+  int64 userId = 1; //userId
+}
+
+message DelUserRoleByUserIdResp {}
+
+
+
+message GetUserRoleByUserIdReq {
+  int64 userId = 1; //id
+}
+
+message GetUserRoleByUserIdResp {
+  int64 total = 1;
+  repeated UserRole userRole = 2; //userRole
+}
+
+message SearchUserRoleReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 userId = 3;
+  int64 roleId = 5; //roleId
+}
+
+message SearchUserRoleResp {
+  int64 total = 1; //total
+  repeated UserRole userRole = 2; //userRole
+}
+
+
+service userRole{
+  //-----------------------userRole-----------------------
+  rpc AddUserRole(AddUserRoleReq) returns (AddUserRoleResp);
+  rpc UpdateUserRole(UpdateUserRoleReq) returns (UpdateUserRoleResp);
+  rpc DelUserRole(DelUserRoleReq) returns (DelUserRoleResp);
+  rpc DelUserRoleByUserId(DelUserRoleByUserIdReq) returns (DelUserRoleByUserIdReq);
+  rpc GetUserRoleByUserId(GetUserRoleByUserIdReq) returns (GetUserRoleByUserIdResp);
+  rpc SearchUserRole(SearchUserRoleReq) returns (SearchUserRoleResp);
+}

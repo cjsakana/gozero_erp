@@ -1,0 +1,496 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+// ------------------------------------ 
+// Messages
+// ------------------------------------ 
+
+// 基础实体定义（用于响应）
+
+message PurchaseRequisition {
+  int64 id = 1; // 采购申请ID
+  string requisitionNo = 2; // 采购申请单号
+  int64 departmentId = 3; // 申请部门
+  int64 applicantId = 4; // 申请人（员工ID）
+  int64 requestDate = 5; // 申请日期
+  double totalAmount = 6; // 申请总金额
+  int64 status = 7; // 状态：0-草稿 1-待审批 2-已审批 3-已驳回
+  int64 approverId = 8; // 审批人
+  int64 approveTime = 9; // 审批时间
+  string approveRemark = 10; // 审批意见
+  int64 createdAt = 11; // createdAt
+  int64 updatedAt = 12; // updatedAt
+}
+
+message PurchaseRequisitionDetail {
+  int64 id = 1; // id
+  int64 requisitionId = 2; // 采购申请单ID
+  int64 productId = 3; // 商品ID（可为原材料/生活用品）
+  string productName = 4; // 商品名称
+  int64 categoryType = 5; // 类别：1-生产原料 2-固定资产 3-生活用品
+  double quantity = 6; // 数量
+  double unitPrice = 7; // 单价
+  double amount = 8; // 金额
+  string remark = 9; // 备注
+}
+
+message PurchaseOrder {
+  int64 id = 1; // 采购订单ID
+  string orderNo = 2; // 采购订单号
+  int64 supplierId = 3; // 供应商ID
+  int64 orderDate = 4; // 下单日期
+  int64 expectedDate = 5; // 期望到货日期
+  double totalAmount = 6; // 订单总金额
+  int64 status = 7; // 状态：0-草稿 1-已提交 2-已确认 3-部分收货 4-已完成 5-已取消
+  int64 purchaserId = 8; // 采购人（员工ID）
+  string contractUrl =9;
+  int64 createdAt = 10; // createdAt
+  int64 updatedAt = 11; // updatedAt
+}
+
+message PurchaseOrderDetail {
+  int64 id = 1; // id
+  int64 orderId = 2; // 采购订单ID
+  int64 productId = 3; // 商品ID
+  string productName = 4; // 商品名称
+  int64 categoryType = 5; // 类别：1-生产原料 2-固定资产 3-生活用品
+  double quantity = 6; // 采购数量
+  double unitPrice = 7; // 采购单价
+  double amount = 8; // 金额
+  double receivedQty = 9; // 已收货数量
+  string remark = 10; // 备注
+}
+
+message PurchaseReceipt {
+  int64 id = 1; // 入库单ID
+  string receiptNo = 2; // 入库单号
+  int64 orderId = 3; // 关联的采购订单ID
+  int64 warehouseId = 4; // 入库仓库
+  int64 receiptDate = 5; // 入库日期
+  double totalQuantity = 6; // 总数量
+  double totalAmount = 7; // 总金额
+  int64 status = 8; // 状态：1-已入库
+  int64 createdAt = 9; // createdAt
+  int64 createdBy = 10; // 操作人（员工ID）
+}
+
+message PurchaseReceiptDetail {
+  int64 id = 1; // id
+  int64 receiptId = 2; // 入库单ID
+  int64 productId = 3; // 商品ID
+  string productName = 4; // 商品名称
+  int64 categoryType = 5; // 类别：1-生产原料 2-固定资产 3-生活用品
+  double quantity = 6; // 入库数量
+  double unitPrice = 7; // 单价
+  double amount = 8; // 金额
+  int64 batchId = 9; // 批次ID（可选）
+}
+
+// ------------------------------------ 
+// 采购申请相关 RPC（使用事务）
+// ------------------------------------ 
+
+// 申请明细输入
+message RequisitionDetailInput {
+  int64 productId = 1; // 商品ID（可为原材料/生活用品）
+  string productName = 2; // 商品名称
+  int64 categoryType = 3; // 类别：1-生产原料 2-固定资产 3-生活用品
+  double quantity = 4; // 数量
+  double unitPrice = 5; // 单价（可选，可用于预算）
+  string remark = 6; // 备注
+}
+
+// 创建采购申请及明细（事务）
+message CreateRequisitionWithDetailsReq {
+  string requisitionNo = 1; // 采购申请单号
+  int64 departmentId = 2; // 申请部门
+  int64 applicantId = 3; // 申请人（员工ID）
+  int64 approverId = 4; //审批人
+  int64 requestDate = 5; // 申请日期（时间戳）
+  double totalAmount = 6; // 申请总金额
+  int64 status = 7; // 状态
+  repeated RequisitionDetailInput details = 8; // 明细列表
+}
+
+message CreateRequisitionWithDetailsResp {
+  int64 requisitionId = 1; // 生成的采购申请ID
+}
+
+// 审批采购申请
+message ApproveRequisitionReq {
+  int64 requisitionId = 1; // 采购申请ID
+  int64 approverId = 2; // 审批人（员工ID）
+  int64 approveTime = 3; // 审批时间（时间戳）
+  string approveRemark = 4; // 审批意见
+  int64 targetStatus = 5; // 目标状态：2-已审批 3-已驳回
+}
+
+message ApproveRequisitionResp {
+}
+
+// 获取采购申请及明细
+message GetRequisitionWithDetailsReq {
+  int64 requisitionId = 1; // 采购申请ID
+}
+
+message GetRequisitionWithDetailsResp {
+  PurchaseRequisition requisition = 1; // 申请主表
+  repeated PurchaseRequisitionDetail details = 2; // 申请明细
+}
+
+// 更新采购申请
+message UpdateRequisitionReq {
+  int64 id = 1; // 采购申请ID
+  int64 departmentId = 2; // 申请部门（可选）
+  int64 applicantId = 3; // 申请人（员工ID）（可选）
+  int64 requestDate = 4; // 申请日期（可选）
+  double totalAmount = 5; // 申请总金额（可选）
+  int64 status = 6; // 状态（可选）
+  int64 approverId = 7; // 审批人（可选）
+  int64 approveTime = 8; // 审批时间（可选）
+  string approveRemark = 9; // 审批意见（可选）
+}
+
+message UpdateRequisitionResp {
+}
+
+// 更新采购申请明细
+message UpdateRequisitionDetailReq {
+  int64 id = 1; // 明细ID
+  int64 productId = 2; // 商品ID（可选）
+  string productName = 3; // 商品名称（可选）
+  int64 categoryType = 4; // 类别（可选）
+  double quantity = 5; // 数量（可选）
+  double unitPrice = 6; // 单价（可选）
+  double amount = 7; // 金额（可选）
+  string remark = 8; // 备注（可选）
+}
+
+message UpdateRequisitionDetailResp {
+}
+
+// ------------------------------------ 
+// 采购订单相关 RPC（使用事务，通过申请ID获取数据）
+// ------------------------------------ 
+
+// 订单明细输入（用于直接创建订单）
+message OrderDetailInput {
+  int64 productId = 1; // 商品ID
+  string productName = 2; // 商品名称
+  int64 categoryType = 3; // 类别：1-生产原料 2-固定资产 3-生活用品
+  double quantity = 4; // 采购数量
+  double unitPrice = 5; // 采购单价
+  double amount = 6; // 金额
+  string remark = 7; // 备注
+}
+
+// 从采购申请创建采购订单（通过 requisition_id 获取申请明细数据，保证一致性）
+// 系统会自动从申请明细中获取商品信息，用户只需提供供应商、订单日期等信息
+message CreateOrderFromRequisitionReq {
+  int64 requisitionId = 1; // 来源申请ID（系统会从申请中获取明细数据）
+  string orderNo = 2; // 采购订单号
+  int64 supplierId = 3; // 供应商ID
+  int64 orderDate = 4; // 下单日期（时间戳）
+  int64 expectedDate = 5; // 期望到货日期（时间戳）
+  int64 purchaserId = 6; // 采购人（员工ID）
+  // 可选：如果明细有变化（如数量、单价调整），可以覆盖
+  // 如果不提供，则使用申请的明细数据
+  repeated OrderDetailInput details = 7; // 订单明细（可选覆盖，如果为空则使用申请的明细）
+}
+
+message CreateOrderFromRequisitionResp {
+  int64 orderId = 1; // 生成的采购订单ID
+}
+
+// 直接创建采购订单及明细（事务，不依赖申请）
+message CreateOrderWithDetailsReq {
+  string orderNo = 1; // 采购订单号
+  int64 supplierId = 2; // 供应商ID
+  int64 orderDate = 3; // 下单日期（时间戳）
+  int64 expectedDate = 4; // 期望到货日期（时间戳）
+  double totalAmount = 5; // 订单总金额
+  int64 status = 6; // 状态：0-草稿 1-已提交
+  int64 purchaserId = 7; // 采购人（员工ID）
+  repeated OrderDetailInput details = 8; // 明细列表
+}
+
+message CreateOrderWithDetailsResp {
+  int64 orderId = 1; // 生成的采购订单ID
+}
+
+// 取消采购订单
+message CancelPurchaseOrderReq {
+  int64 orderId = 1; // 采购订单ID
+  string cancelReason = 2; // 取消原因
+}
+
+message CancelPurchaseOrderResp {
+}
+
+// 获取采购订单及明细
+message GetOrderWithDetailsReq {
+  int64 orderId = 1; // 采购订单ID
+}
+
+message GetOrderWithDetailsResp {
+  PurchaseOrder order = 1; // 订单主表
+  repeated PurchaseOrderDetail details = 2; // 订单明细
+}
+
+// 更新采购订单
+message UpdateOrderReq {
+  int64 id = 1; // 采购订单ID
+  int64 supplierId = 2; // 供应商ID（可选）
+  int64 orderDate = 3; // 下单日期（可选）
+  int64 expectedDate = 4; // 期望到货日期（可选）
+  double totalAmount = 5; // 订单总金额（可选）
+  int64 status = 6; // 状态（可选）
+  int64 purchaserId = 7; // 采购人（员工ID）（可选）
+  string contractUrl = 8; // 合同URL（可选）
+}
+
+message UpdateOrderResp {
+}
+
+// 更新采购订单明细
+message UpdateOrderDetailReq {
+  int64 id = 1; // 明细ID
+  int64 productId = 2; // 商品ID（可选）
+  string productName = 3; // 商品名称（可选）
+  int64 categoryType = 4; // 类别（可选）
+  double quantity = 5; // 采购数量（可选）
+  double unitPrice = 6; // 采购单价（可选）
+  double amount = 7; // 金额（可选）
+  double receivedQty = 8; // 已收货数量（可选）
+  string remark = 9; // 备注（可选）
+}
+
+message UpdateOrderDetailResp {
+}
+
+// ------------------------------------ 
+// 采购入库相关 RPC（使用事务，通过订单ID获取数据）
+// ------------------------------------ 
+
+// 入库明细输入（用于直接创建入库单）
+message ReceiptDetailInput {
+  int64 productId = 1; // 商品ID
+  string productName = 2; // 商品名称
+  int64 categoryType = 3; // 类别：1-生产原料 2-固定资产 3-生活用品
+  double quantity = 4; // 入库数量
+  double unitPrice = 5; // 单价
+  double amount = 6; // 金额
+  int64 batchId = 7; // 批次ID（可选）
+}
+
+// 从采购订单创建入库单（通过 order_id 获取订单明细数据，保证一致性）
+// 系统会自动从订单明细中获取商品信息，用户只需提供仓库、入库日期等信息
+message CreateReceiptFromOrderReq {
+  int64 orderId = 1; // 来源订单ID（系统会从订单中获取明细数据）
+  string receiptNo = 2; // 入库单号
+  int64 warehouseId = 3; // 入库仓库
+  int64 receiptDate = 4; // 入库日期（时间戳）
+  int64 createdBy = 5; // 操作人（员工ID）
+  // 可选：如果明细有变化（如部分入库、数量调整），可以覆盖
+  // 如果不提供，则使用订单的明细数据，数量使用订单数量减去已收货数量
+  repeated ReceiptDetailInput details = 6; // 入库明细（可选覆盖，如果为空则使用订单的未收货明细）
+}
+
+message CreateReceiptFromOrderResp {
+  int64 receiptId = 1; // 生成的入库单ID
+}
+
+// 直接创建入库单及明细（事务，不依赖订单）
+message CreateReceiptWithDetailsReq {
+  string receiptNo = 1; // 入库单号
+  int64 orderId = 2; // 关联的采购订单ID（可选，如果有关联）
+  int64 warehouseId = 3; // 入库仓库
+  int64 receiptDate = 4; // 入库日期（时间戳）
+  double totalQuantity = 5; // 总数量
+  double totalAmount = 6; // 总金额
+  int64 status = 7; // 状态：1-已入库
+  int64 createdBy = 8; // 操作人（员工ID）
+  repeated ReceiptDetailInput details = 9; // 明细列表
+}
+
+message CreateReceiptWithDetailsResp {
+  int64 receiptId = 1; // 生成的入库单ID
+}
+
+// 获取入库单及明细
+message GetReceiptWithDetailsReq {
+  int64 receiptId = 1; // 入库单ID
+}
+
+message GetReceiptWithDetailsResp {
+  PurchaseReceipt receipt = 1; // 入库单主表
+  repeated PurchaseReceiptDetail details = 2; // 入库明细
+}
+
+// 更新采购入库单
+message UpdateReceiptReq {
+  int64 id = 1; // 入库单ID
+  int64 orderId = 2; // 关联的采购订单ID（可选）
+  int64 warehouseId = 3; // 入库仓库（可选）
+  int64 receiptDate = 4; // 入库日期（可选）
+  double totalQuantity = 5; // 总数量（可选）
+  double totalAmount = 6; // 总金额（可选）
+  int64 status = 7; // 状态（可选）
+  int64 createdBy = 8; // 操作人（员工ID）（可选）
+}
+
+message UpdateReceiptResp {
+}
+
+// 更新采购入库明细
+message UpdateReceiptDetailReq {
+  int64 id = 1; // 明细ID
+  int64 productId = 2; // 商品ID（可选）
+  string productName = 3; // 商品名称（可选）
+  int64 categoryType = 4; // 类别（可选）
+  double quantity = 5; // 入库数量（可选）
+  double unitPrice = 6; // 单价（可选）
+  double amount = 7; // 金额（可选）
+  int64 batchId = 8; // 批次ID（可选）
+}
+
+message UpdateReceiptDetailResp {
+}
+
+// ------------------------------------ 
+// 查询相关 RPC
+// ------------------------------------ 
+message PurchaseRequisitionWithDetails{
+  PurchaseRequisition requisitions = 1;
+  int64 total = 2; // 总数
+  repeated PurchaseRequisitionDetail details = 3;
+}
+
+
+message SearchRequisitionReq {
+  int64 page = 1; // 页码
+  int64 limit = 2; // 每页数量
+  string requisitionNo = 3; // 采购申请单号（可选）
+  int64 departmentId = 4; // 申请部门（可选）
+  int64 applicantId = 5; // 申请人（可选）
+  int64 approverId = 6; // 审批人（可选）
+  int64 status = 7; // 状态（可选）
+}
+
+message SearchRequisitionResp {
+  repeated PurchaseRequisitionWithDetails requisitionsWithDetails = 1; // 申请列表
+  int64 total = 2; // 总数
+}
+
+message PurchaseOrderWithDetails{
+  PurchaseOrder orders = 1; // 订单列表
+  int64 total = 2; // 总数
+  repeated PurchaseOrderDetail details = 3;
+}
+
+message SearchOrderReq {
+  int64 page = 1; // 页码
+  int64 limit = 2; // 每页数量
+  string orderNo = 3; // 采购订单号（可选）
+  int64 supplierId = 4; // 供应商ID（可选）
+  int64 status = 5; // 状态（可选）
+}
+
+message SearchOrderResp {
+  repeated PurchaseOrderWithDetails ordersWithDetails = 1; // 订单列表
+  int64 total = 2; // 总数
+}
+
+
+message PurchaseReceiptWithDetails{
+  PurchaseReceipt receipts = 1; // 入库单列表
+  int64 total = 2; // 总数
+  repeated PurchaseReceiptDetail details = 3;
+}
+
+message SearchReceiptReq {
+  int64 page = 1; // 页码
+  int64 limit = 2; // 每页数量
+  string receiptNo = 3; // 入库单号（可选）
+  int64 orderId = 4; // 关联的采购订单ID（可选）
+  int64 warehouseId = 5; // 入库仓库（可选）
+}
+
+message SearchReceiptResp {
+  repeated PurchaseReceiptWithDetails receiptsWithDetails = 1; // 入库单列表
+  int64 total = 2; // 总数
+}
+
+// ------------------------------------ 
+// RPC Services
+// ------------------------------------ 
+
+// 采购申请服务
+service purchaseRequisition {
+  // 创建采购申请及明细（事务）
+  rpc CreateRequisitionWithDetails(CreateRequisitionWithDetailsReq) returns (CreateRequisitionWithDetailsResp);
+
+  // 审批采购申请
+  rpc ApproveRequisition(ApproveRequisitionReq) returns (ApproveRequisitionResp);
+
+  // 获取采购申请及明细
+  rpc GetRequisitionWithDetails(GetRequisitionWithDetailsReq) returns (GetRequisitionWithDetailsResp);
+
+  // 查询采购申请
+  rpc SearchRequisition(SearchRequisitionReq) returns (SearchRequisitionResp);
+
+  // 更新采购申请（动态SQL拼接）
+  rpc UpdateRequisition(UpdateRequisitionReq) returns (UpdateRequisitionResp);
+
+  // 更新采购申请明细（动态SQL拼接）
+  rpc UpdateRequisitionDetail(UpdateRequisitionDetailReq) returns (UpdateRequisitionDetailResp);
+}
+
+// 采购订单服务
+service purchaseOrder {
+  // 从采购申请创建采购订单（通过 requisition_id 获取申请明细数据，保证一致性）
+  rpc CreateOrderFromRequisition(CreateOrderFromRequisitionReq) returns (CreateOrderFromRequisitionResp);
+
+  // 直接创建采购订单及明细（事务）
+  rpc CreateOrderWithDetails(CreateOrderWithDetailsReq) returns (CreateOrderWithDetailsResp);
+
+  // 取消采购订单
+  rpc CancelPurchaseOrder(CancelPurchaseOrderReq) returns (CancelPurchaseOrderResp);
+
+  // 获取采购订单及明细
+  rpc GetOrderWithDetails(GetOrderWithDetailsReq) returns (GetOrderWithDetailsResp);
+
+  // 查询采购订单
+  rpc SearchOrder(SearchOrderReq) returns (SearchOrderResp);
+
+  // 更新采购订单（动态SQL拼接）
+  rpc UpdateOrder(UpdateOrderReq) returns (UpdateOrderResp);
+
+  // 更新采购订单明细（动态SQL拼接）
+  rpc UpdateOrderDetail(UpdateOrderDetailReq) returns (UpdateOrderDetailResp);
+}
+
+// 采购入库服务
+service purchaseReceipt {
+  // 从采购订单创建入库单（通过 order_id 获取订单明细数据，保证一致性）
+  rpc CreateReceiptFromOrder(CreateReceiptFromOrderReq) returns (CreateReceiptFromOrderResp);
+
+  // 直接创建入库单及明细（事务）
+  rpc CreateReceiptWithDetails(CreateReceiptWithDetailsReq) returns (CreateReceiptWithDetailsResp);
+
+  // 获取入库单及明细
+  rpc GetReceiptWithDetails(GetReceiptWithDetailsReq) returns (GetReceiptWithDetailsResp);
+
+  // 查询入库单
+  rpc SearchReceipt(SearchReceiptReq) returns (SearchReceiptResp);
+
+  // 更新采购入库单（动态SQL拼接）
+  rpc UpdateReceipt(UpdateReceiptReq) returns (UpdateReceiptResp);
+
+  // 更新采购入库明细（动态SQL拼接）
+  rpc UpdateReceiptDetail(UpdateReceiptDetailReq) returns (UpdateReceiptDetailResp);
+}
+

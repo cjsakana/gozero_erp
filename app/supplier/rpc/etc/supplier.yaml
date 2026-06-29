@@ -1,0 +1,16 @@
+Name: supplier.rpc
+ListenOn: 0.0.0.0:9006
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: supplier.rpc
+
+DataSource: root:123456@tcp(127.0.0.1:3306)/erp_supplier?parseTime=true
+CacheRedis:
+  - Host: 127.0.0.1:6379
+    Pass:
+    Type: node
+BizRedis:
+  Host: 127.0.0.1:6379
+  Pass:
+  Type: node

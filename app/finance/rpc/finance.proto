@@ -1,0 +1,349 @@
+syntax = "proto3";
+
+option go_package ="./pb";
+
+package pb;
+
+// ------------------------------------ 
+// Messages
+// ------------------------------------ 
+
+//--------------------------------fixedAsset--------------------------------
+message FixedAsset {
+  int64 id=1; //id
+  string assetNo = 2; //资产编号
+  string assetName = 3; //资产名称
+  string category = 4; //资产类别
+  int64 purchaseDate = 5; //购买日期
+  double purchasePrice = 6; //购买价格
+  int64 supplierId = 7; //供应商ID
+  int64 departmentId = 8; //使用部门
+  int64 userId = 9; //使用人ID
+  int64 status = 10; //状态：1-在用 2-报废 3-维修中
+  string location = 11; //存放地点
+  string depreciationMethod = 12; //折旧方法
+  int64 usefulLife = 13; //使用年限 单位月
+  int64 createdAt = 14; //创建时间
+}
+
+message AddFixedAssetReq {
+  string assetName = 2; //资产名称
+  string category = 3; //资产类别
+  int64 purchaseDate = 4; //购买日期
+  double purchasePrice = 5; //购买价格
+  int64 supplierId = 6; //供应商ID
+  int64 departmentId = 7; //使用部门
+  int64 userId = 8; //使用人ID
+  int64 status = 9; //状态：1-在用 2-报废 3-维修中
+  string location = 10; //存放地点
+  string depreciationMethod = 11; //折旧方法
+  int64 usefulLife = 12; //使用年限 单位月
+}
+
+message AddFixedAssetResp {
+  int64 id = 1; // 主键ID
+}
+
+message UpdateFixedAssetReq {
+  int64 id=1; //id
+  string assetName = 2; //资产名称
+  string category = 3; //资产类别
+  int64 purchaseDate = 4; //购买日期
+  double purchasePrice = 5; //购买价格
+  int64 supplierId = 6; //供应商ID
+  int64 departmentId = 7; //使用部门
+  int64 userId = 8; //使用人ID
+  int64 status = 9; //状态：1-在用 2-报废 3-维修中
+  string location = 10; //存放地点
+  string depreciationMethod = 11; //折旧方法
+  int64 usefulLife = 12; //使用年限 单位月
+}
+
+message UpdateFixedAssetResp {
+}
+
+message GetFixedAssetByIdReq {
+  int64 id = 1; //id
+}
+
+message GetFixedAssetByIdResp {
+  FixedAsset fixedAsset = 1; //fixedAsset
+}
+
+message SearchFixedAssetReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string assetNo = 3; //资产编号
+  string assetName = 4; //资产名称
+  string category = 5; //资产类别
+  int64 supplierId = 8; //供应商ID
+  int64 departmentId = 9; //使用部门
+  int64 status = 11; //状态：1-在用 2-报废 3-维修中
+}
+
+message SearchFixedAssetResp {
+  repeated FixedAsset fixedAsset = 1; //fixedAsset
+  int64 total=2;
+}
+
+//--------------------------------paymentRecord--------------------------------
+message PaymentRecord {
+  int64 id = 1; //id
+  string paymentNo = 2; //付款单号
+  int64 supplierId = 3; //供应商ID
+  int64 orderId = 4; //关联采购订单ID
+  int64 paymentType = 5; //类型：1-预付款 2-货款 3-其他
+  double amount = 6; //付款金额
+  int64 paymentDate = 7; //付款日期
+  string paymentMethod = 8; //付款方式：银行转账/现金等
+  int64 status = 9; //状态：1-未付款 2-部分付款 3-已付款
+  int64 verifyStatus = 10; //核销状态：1-未核销 2-部分核销 3-已核销
+  int64 operatorId = 11; //操作人ID
+  int64 createdAt = 12; //创建时间
+}
+
+message AddPaymentRecordReq {
+  int64 supplierId = 2; //供应商ID
+  int64 orderId = 3; //关联采购订单ID
+  int64 paymentType = 4; //类型：1-预付款 2-货款 3-其他
+  double amount = 5; //付款金额
+  int64 paymentDate = 6; //付款日期
+  string paymentMethod = 7; //付款方式：银行转账/现金等
+  int64 status = 8; //状态：1-未付款 2-部分付款 3-已付款
+  int64 verifyStatus = 9; //核销状态：1-未核销 2-部分核销 3-已核销
+  int64 operatorId = 10; //操作人ID
+}
+
+message AddPaymentRecordResp {
+  int64 id = 1; //id
+}
+
+message UpdatePaymentRecordReq {
+  int64 id = 1; //id
+  int64 supplierId = 3; //供应商ID
+  int64 orderId = 4; //关联采购订单ID
+  int64 paymentType = 5; //类型：1-预付款 2-货款 3-其他
+  double amount = 6; //付款金额
+  int64 paymentDate = 7; //付款日期
+  string paymentMethod = 8; //付款方式：银行转账/现金等
+  int64 status = 9; //状态：1-未付款 2-部分付款 3-已付款
+  int64 verifyStatus = 10; //核销状态：1-未核销 2-部分核销 3-已核销
+  int64 operatorId = 11; //操作人ID
+}
+
+message UpdatePaymentRecordResp {
+}
+
+message GetPaymentRecordByIdReq {
+  int64 id = 1; //id
+}
+
+message GetPaymentRecordByIdResp {
+  PaymentRecord paymentRecord = 1; //paymentRecord
+}
+
+message SearchPaymentRecordReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string paymentNo = 4; //付款单号
+  int64 supplierId = 5; //供应商ID
+  int64 paymentType = 6; //类型：1-预付款 2-货款 3-其他
+  string paymentMethod = 9; //付款方式：银行转账/现金等
+  int64 status = 11; //状态：1-已付款
+}
+
+message SearchPaymentRecordResp {
+  repeated PaymentRecord paymentRecord = 1; //paymentRecord
+  int64 total=2;
+}
+
+//--------------------------------receiptRecord--------------------------------
+message ReceiptRecord {
+  int64 id = 1; //id
+  string receiptNo = 2; //收款单号
+  int64 customerId = 3; //客户ID
+  int64 orderId = 4; //关联采购订单ID
+  int64 receiptType = 5; //类型：1-预收款 2-货款 3-其他
+  double amount = 6; //收款金额
+  int64 receiptDate = 7; //收款日期
+  string receiptMethod = 8; //收款方式
+  int64 status = 9; //状态：1-未付款 2-部分付款 3-已付款
+  int64 verifyStatus = 10; //核销状态：1-未核销 2-部分核销 3-已核销
+  int64 operatorId = 11; //操作人ID
+  int64 createdAt = 12; //createdAt
+}
+
+message AddReceiptRecordReq {
+  int64 customerId = 2; //客户ID
+  int64 orderId = 3; //关联采购订单ID
+  int64 receiptType = 4; //类型：1-预收款 2-货款 3-其他
+  double amount = 5; //收款金额
+  int64 receiptDate = 6; //收款日期
+  string receiptMethod = 7; //收款方式
+  int64 status = 8; //状态：1-未付款 2-部分付款 3-已付款
+  int64 verifyStatus = 9; //核销状态：1-未核销 2-部分核销 3-已核销
+  int64 operatorId = 10; //操作人ID
+}
+
+message AddReceiptRecordResp {
+  int64 id = 1; //id
+}
+
+message UpdateReceiptRecordReq {
+  int64 id = 1; //id
+  int64 customerId = 3; //客户ID
+  int64 orderId = 4; //关联采购订单ID
+  int64 receiptType = 5; //类型：1-预收款 2-货款 3-其他
+  double amount = 6; //收款金额
+  int64 receiptDate = 7; //收款日期
+  string receiptMethod = 8; //收款方式
+  int64 status = 9; //状态：1-未付款 2-部分付款 3-已付款
+  int64 verifyStatus = 10; //核销状态：1-未核销 2-部分核销 3-已核销
+  int64 operatorId = 11; //操作人ID
+}
+
+message UpdateReceiptRecordResp {
+}
+
+message GetReceiptRecordByIdReq {
+  int64 id = 1; //id
+}
+
+message GetReceiptRecordByIdResp {
+  ReceiptRecord receiptRecord = 1; //receiptRecord
+}
+
+message SearchReceiptRecordReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  string receiptNo = 4; //收款单号
+  int64 customerId = 5; //客户ID
+  int64 receiptType = 6; //类型：1-预收款 2-货款 3-其他
+  string receiptMethod = 9; //收款方式
+  int64 status = 11; //状态：1-已收款
+  int64 operatorId = 12; //操作人ID
+}
+
+message SearchReceiptRecordResp {
+  repeated ReceiptRecord receiptRecord = 1; //receiptRecord
+  int64 total=2;
+}
+
+//--------------------------------salaryPayment--------------------------------
+message SalaryPayment {
+  int64 id = 1; //主键ID
+  int64 payrollId = 2; //关联payroll_record.id
+  int64 employeeId = 3; //员工ID
+  string employeeName = 4; //员工姓名
+  int64 departmentId = 5; //部门ID
+  int64 paymentMonth = 6; //工资月份（如 2024-06-01 表示 6 月工资）
+  double baseSalary = 7; //基本工资
+  double bonus = 8; //奖金
+  double overtimePay = 9; //加班费
+  double deduction = 10; //扣款（如社保、个税）
+  double netPayment = 11; //实发工资（最终打款金额）
+  int64 paymentDate = 12; //实际付款日期
+  string paymentMethod = 13; //付款方式（如银行转账）
+  string bankAccount = 14; //收款银行账号（可选）
+  string referenceNo = 15; //银行流水号 / 付款单号
+  int64 status = 16; //状态：1-已支付，0-待支付，2-已撤销
+  int64 createdAt = 17; //创建时间
+  int64 updatedAt = 18; //更新时间
+}
+
+message AddSalaryPaymentReq {
+  int64 payrollId = 2; //关联payroll_record.id
+  int64 employeeId = 3; //员工ID
+  string employeeName = 4; //员工姓名
+  int64 departmentId = 5; //部门ID
+  int64 paymentMonth = 6; //工资月份（如 2024-06-01 表示 6 月工资）
+  double baseSalary = 7; //基本工资
+  double bonus = 8; //奖金
+  double overtimePay = 9; //加班费
+  double deduction = 10; //扣款（如社保、个税）
+  double netPayment = 11; //实发工资（最终打款金额）
+  int64 paymentDate = 12; //实际付款日期
+  string paymentMethod = 13; //付款方式（如银行转账）
+  string bankAccount = 14; //收款银行账号（可选）
+  string referenceNo = 15; //银行流水号 / 付款单号
+  int64 status = 16; //状态：1-已支付，0-待支付，2-已撤销
+}
+
+message AddSalaryPaymentResp {
+  int64 id = 1; //id
+}
+
+message UpdateSalaryPaymentReq {
+  int64 id = 1; //主键ID
+  double bonus = 7; //奖金
+  double overtimePay = 8; //加班费
+  double deduction = 9; //扣款（如社保、个税）
+  double netPayment = 10; //实发工资（最终打款金额）
+  int64 paymentDate = 11; //实际付款日期
+  string paymentMethod = 12; //付款方式（如银行转账）
+  string bankAccount = 13; //收款银行账号（可选）
+  string referenceNo = 14; //银行流水号 / 付款单号
+  int64 status = 15; //状态：1-已支付，0-待支付，2-已撤销
+}
+
+message UpdateSalaryPaymentResp {
+}
+
+message GetSalaryPaymentByIdReq {
+  int64 id = 1; //id
+}
+
+message GetSalaryPaymentByIdResp {
+  SalaryPayment salaryPayment = 1; //salaryPayment
+}
+
+message SearchSalaryPaymentReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 employeeId = 4; //员工ID
+  int64 departmentId = 6; //部门ID
+  int64 paymentMonth = 7; //工资月份（如 2024-06-01 表示 6 月工资）
+  int64 status = 17; //状态：1-已支付，0-待支付，2-已撤销
+}
+
+message SearchSalaryPaymentResp {
+  repeated SalaryPayment salaryPayment = 1; //salaryPayment
+  int64 total=2;
+}
+
+
+
+// ------------------------------------ 
+// Rpc Func
+// ------------------------------------ 
+
+service fixedAsset{
+
+	 //-----------------------fixedAsset----------------------- 
+	 rpc AddFixedAsset(AddFixedAssetReq) returns (AddFixedAssetResp); 
+	 rpc UpdateFixedAsset(UpdateFixedAssetReq) returns (UpdateFixedAssetResp);
+	 rpc GetFixedAssetById(GetFixedAssetByIdReq) returns (GetFixedAssetByIdResp); 
+	 rpc SearchFixedAsset(SearchFixedAssetReq) returns (SearchFixedAssetResp);
+}
+service paymentRecord{
+  //-----------------------paymentRecord-----------------------
+  rpc AddPaymentRecord(AddPaymentRecordReq) returns (AddPaymentRecordResp);
+  rpc UpdatePaymentRecord(UpdatePaymentRecordReq) returns (UpdatePaymentRecordResp);
+  rpc GetPaymentRecordById(GetPaymentRecordByIdReq) returns (GetPaymentRecordByIdResp);
+  rpc SearchPaymentRecord(SearchPaymentRecordReq) returns (SearchPaymentRecordResp);
+}
+service receiptRecord{
+  //-----------------------receiptRecord-----------------------
+  rpc AddReceiptRecord(AddReceiptRecordReq) returns (AddReceiptRecordResp);
+  rpc UpdateReceiptRecord(UpdateReceiptRecordReq) returns (UpdateReceiptRecordResp);
+  rpc GetReceiptRecordById(GetReceiptRecordByIdReq) returns (GetReceiptRecordByIdResp);
+  rpc SearchReceiptRecord(SearchReceiptRecordReq) returns (SearchReceiptRecordResp);
+}
+service salaryPayment{
+  //-----------------------salaryPayment-----------------------
+  // AddSalaryPayment 可被 DTM Msg 模式调用（由 HR 服务通过 DTM 发起）
+  rpc AddSalaryPayment(AddSalaryPaymentReq) returns (AddSalaryPaymentResp);
+  rpc UpdateSalaryPayment(UpdateSalaryPaymentReq) returns (UpdateSalaryPaymentResp);
+  rpc GetSalaryPaymentById(GetSalaryPaymentByIdReq) returns (GetSalaryPaymentByIdResp);
+  rpc SearchSalaryPayment(SearchSalaryPaymentReq) returns (SearchSalaryPaymentResp);
+}

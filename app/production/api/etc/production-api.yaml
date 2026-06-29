@@ -1,0 +1,42 @@
+Name: production-api
+Host: 0.0.0.0
+Port: 8020
+
+Etcd:
+  Key: rpcServer
+  Hosts:
+    - "127.0.0.1:2379"
+
+Auth:
+  AccessSecret: qsHUADZu9izXb8-rRl8SeSuZBYdoO
+  AccessExpire: 604800
+
+AuthRPC:
+  Etcd:
+    Key: auth.rpc
+  NonBlock: true
+
+ProductionRPC:
+  Etcd:
+    Key: production.rpc
+  NonBlock: true
+
+HrRPC:
+  Etcd:
+    Key: hr.rpc
+  NonBlock: true
+
+InventoryRPC:
+  Etcd:
+    Key: inventory.rpc
+  NonBlock: true
+
+ProductRPC:
+  Etcd:
+    Key: product.rpc
+  NonBlock: true
+
+BizRedis:
+  Host: 127.0.0.1:6379
+  Pass:
+  Type: node

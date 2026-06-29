@@ -1,0 +1,251 @@
+﻿-- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
+--
+-- Host: localhost    Database: erp_purchase
+-- ------------------------------------------------------
+-- Server version	8.0.32
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Current Database: `erp_purchase`
+--
+
+/*!40000 DROP DATABASE IF EXISTS `erp_purchase`*/;
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `erp_purchase` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `erp_purchase`;
+
+--
+-- Table structure for table `purchase_order`
+--
+
+DROP TABLE IF EXISTS `purchase_order`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `purchase_order` (
+  `id` bigint NOT NULL COMMENT '采购订单ID',
+  `order_no` varchar(50) NOT NULL COMMENT '采购订单号',
+  `supplier_id` bigint NOT NULL COMMENT '供应商ID',
+  `order_date` date NOT NULL COMMENT '下单日期',
+  `expected_date` date DEFAULT NULL COMMENT '期望到货日期',
+  `total_amount` decimal(12,2) DEFAULT '0.00' COMMENT '订单总金额',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态： 1-已提交 2-已确认 3-部分收货 4-已完成 5-已取消',
+  `purchaser_id` bigint NOT NULL COMMENT '采购人（员工id）',
+  `contract_url` varchar(255) DEFAULT NULL COMMENT '合同URL',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `order_no` (`order_no`),
+  KEY `idx_supplier_id` (`supplier_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_order_date` (`order_date`),
+  KEY `idx_purchaser_no` (`purchaser_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `purchase_order`
+--
+
+LOCK TABLES `purchase_order` WRITE;
+/*!40000 ALTER TABLE `purchase_order` DISABLE KEYS */;
+INSERT INTO `purchase_order` VALUES (607292793026519990,'PO20260219-504312021001',604984444868109238,'2026-02-20','2026-02-21',2500.00,5,7000000000000000003,NULL,'2026-02-19 20:31:52','2026-02-19 20:40:37'),(6200000000000000001,'PO202501001',3000000000000000001,'2025-01-05','2025-01-08',45000.00,4,7000000000000000006,NULL,'2025-01-05 10:00:00','2025-01-08 16:00:00'),(6200000000000000002,'PO202501002',3000000000000000004,'2025-01-06','2025-01-10',8800.00,4,7000000000000000007,NULL,'2025-01-06 11:00:00','2025-01-10 15:00:00'),(6200000000000000003,'PO202501003',3000000000000000002,'2025-01-16','2025-01-25',93000.00,4,7000000000000000006,'contracts/PO202501003.pdf','2025-01-16 10:00:00','2025-01-25 16:00:00'),(6200000000000000004,'PO202501004',3000000000000000001,'2025-01-20','2025-01-30',67200.00,3,7000000000000000007,NULL,'2025-01-20 09:00:00','2025-01-28 14:00:00'),(6200000000000000005,'PO202502001',3000000000000000003,'2025-01-28','2025-02-05',35000.00,2,7000000000000000006,NULL,'2025-01-28 10:00:00','2025-01-29 09:00:00'),(6200000000000000006,'PO202502002',3000000000000000005,'2025-01-30','2025-02-10',28500.00,1,7000000000000000007,NULL,'2025-01-30 14:00:00','2026-02-19 16:48:12');
+/*!40000 ALTER TABLE `purchase_order` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `purchase_order_detail`
+--
+
+DROP TABLE IF EXISTS `purchase_order_detail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `purchase_order_detail` (
+  `id` bigint NOT NULL,
+  `order_id` bigint NOT NULL COMMENT '采购订单ID',
+  `product_id` bigint DEFAULT NULL COMMENT '商品ID',
+  `product_name` varchar(100) DEFAULT NULL COMMENT '商品名称',
+  `category_type` tinyint NOT NULL COMMENT '类别：1-生产原料 2-固定资产 3-生活用品',
+  `quantity` decimal(10,2) NOT NULL COMMENT '采购数量',
+  `unit_price` decimal(12,2) NOT NULL COMMENT '采购单价',
+  `amount` decimal(12,2) NOT NULL COMMENT '金额',
+  `received_qty` decimal(10,2) DEFAULT '0.00' COMMENT '已收货数量',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `purchase_order_detail`
+--
+
+LOCK TABLES `purchase_order_detail` WRITE;
+/*!40000 ALTER TABLE `purchase_order_detail` DISABLE KEYS */;
+INSERT INTO `purchase_order_detail` VALUES (607292793026585526,607292793026519990,0,'办公用品',3,1.00,2500.00,2500.00,0.00,'月度办公用品采购'),(6300000000000000001,6200000000000000001,1100000000000000001,'Q235碳钢板',1,10.00,4500.00,45000.00,10.00,'全部收货'),(6300000000000000002,6200000000000000002,1100000000000000008,'六角螺栓M16*80',1,2000.00,2.50,5000.00,2000.00,'全部收货'),(6300000000000000003,6200000000000000002,1100000000000000009,'六角螺母M16',1,3000.00,1.20,3600.00,3000.00,'全部收货'),(6300000000000000004,6200000000000000002,1100000000000000010,'平垫圈16',1,1000.00,0.20,200.00,1000.00,'全部收货'),(6300000000000000005,6200000000000000003,1100000000000000002,'Q345低合金钢板',1,15.00,4800.00,72000.00,15.00,'全部收货'),(6300000000000000006,6200000000000000003,1100000000000000005,'角钢',1,5.00,4200.00,21000.00,5.00,'全部收货'),(6300000000000000007,6200000000000000004,1100000000000000001,'Q235碳钢板',1,8.00,4500.00,36000.00,5.00,'已收5吨'),(6300000000000000008,6200000000000000004,1100000000000000004,'45#圆钢',1,6.00,5200.00,31200.00,4.00,'已收4吨'),(6300000000000000009,6200000000000000005,1100000000000000011,'深沟球轴承6208',1,100.00,85.00,8500.00,0.00,'待收货'),(6300000000000000010,6200000000000000005,1100000000000000012,'圆锥滚子轴承30210',1,80.00,125.00,10000.00,0.00,'待收货'),(6300000000000000011,6200000000000000005,1100000000000000029,'轴承座组件',1,50.00,330.00,16500.00,0.00,'待收货');
+/*!40000 ALTER TABLE `purchase_order_detail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `purchase_receipt`
+--
+
+DROP TABLE IF EXISTS `purchase_receipt`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `purchase_receipt` (
+  `id` bigint NOT NULL COMMENT '入库单ID',
+  `receipt_no` varchar(50) NOT NULL COMMENT '入库单号',
+  `order_id` bigint DEFAULT NULL COMMENT '关联的采购订单ID',
+  `warehouse_id` bigint NOT NULL COMMENT '入库仓库',
+  `receipt_date` date NOT NULL COMMENT '入库日期',
+  `total_quantity` decimal(12,2) DEFAULT '0.00' COMMENT '总数量',
+  `total_amount` decimal(12,2) DEFAULT '0.00' COMMENT '总金额',
+  `status` tinyint DEFAULT '1' COMMENT '状态：1-已入库',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` bigint NOT NULL COMMENT '操作人（员工id）',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `receipt_no` (`receipt_no`),
+  KEY `idx_order_id` (`order_id`),
+  KEY `idx_warehouse_id` (`warehouse_id`),
+  KEY `idx_receipt_date` (`receipt_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `purchase_receipt`
+--
+
+LOCK TABLES `purchase_receipt` WRITE;
+/*!40000 ALTER TABLE `purchase_receipt` DISABLE KEYS */;
+INSERT INTO `purchase_receipt` VALUES (6400000000000000001,'PR202501001',6200000000000000001,4100000000000000001,'2025-01-08',10.00,45000.00,1,'2025-01-08 16:00:00',7000000000000000011),(6400000000000000002,'PR202501002',6200000000000000002,4100000000000000002,'2025-01-10',6000.00,8800.00,1,'2025-01-10 15:00:00',7000000000000000011),(6400000000000000003,'PR202501003',6200000000000000003,4100000000000000001,'2025-01-25',20.00,93000.00,1,'2025-01-25 16:00:00',7000000000000000011),(6400000000000000004,'PR202501004-1',6200000000000000004,4100000000000000001,'2025-01-28',9.00,40900.00,1,'2025-01-28 14:00:00',7000000000000000011);
+/*!40000 ALTER TABLE `purchase_receipt` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `purchase_receipt_detail`
+--
+
+DROP TABLE IF EXISTS `purchase_receipt_detail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `purchase_receipt_detail` (
+  `id` bigint NOT NULL,
+  `receipt_id` bigint NOT NULL COMMENT '入库单ID',
+  `product_id` bigint NOT NULL COMMENT '商品ID',
+  `product_name` varchar(100) DEFAULT NULL COMMENT '商品名称',
+  `category_type` tinyint NOT NULL COMMENT '类别：1-生产原料 2-固定资产 3-生活用品',
+  `quantity` decimal(10,2) NOT NULL COMMENT '已入库数量',
+  `unit_price` decimal(12,2) NOT NULL COMMENT '单价',
+  `amount` decimal(12,2) NOT NULL COMMENT '金额',
+  `batch_id` bigint DEFAULT NULL COMMENT '批次号（可选）',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `purchase_receipt_detail`
+--
+
+LOCK TABLES `purchase_receipt_detail` WRITE;
+/*!40000 ALTER TABLE `purchase_receipt_detail` DISABLE KEYS */;
+INSERT INTO `purchase_receipt_detail` VALUES (6500000000000000001,6400000000000000001,1100000000000000001,'Q235碳钢板',1,10.00,4500.00,45000.00,NULL),(6500000000000000002,6400000000000000002,1100000000000000008,'六角螺栓M16*80',1,2000.00,2.50,5000.00,NULL),(6500000000000000003,6400000000000000002,1100000000000000009,'六角螺母M16',1,3000.00,1.20,3600.00,NULL),(6500000000000000004,6400000000000000002,1100000000000000010,'平垫圈16',1,1000.00,0.20,200.00,NULL),(6500000000000000005,6400000000000000003,1100000000000000002,'Q345低合金钢板',1,15.00,4800.00,72000.00,NULL),(6500000000000000006,6400000000000000003,1100000000000000005,'角钢',1,5.00,4200.00,21000.00,NULL),(6500000000000000007,6400000000000000004,1100000000000000001,'Q235碳钢板',1,5.00,4500.00,22500.00,NULL),(6500000000000000008,6400000000000000004,1100000000000000004,'45#圆钢',1,4.00,5200.00,20800.00,NULL);
+/*!40000 ALTER TABLE `purchase_receipt_detail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `purchase_requisition`
+--
+
+DROP TABLE IF EXISTS `purchase_requisition`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `purchase_requisition` (
+  `id` bigint NOT NULL COMMENT '采购申请ID，雪花',
+  `requisition_no` varchar(50) NOT NULL COMMENT '采购申请单号',
+  `department_id` bigint NOT NULL COMMENT '申请部门',
+  `applicant_id` bigint NOT NULL COMMENT '申请人（员工工号）',
+  `request_date` date NOT NULL COMMENT '申请日期',
+  `total_amount` decimal(12,2) DEFAULT '0.00' COMMENT '申请总金额',
+  `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态： 1-待审批 2-已审批 3-已驳回 4-已转订单',
+  `approver_id` bigint DEFAULT NULL COMMENT '审批人',
+  `approve_time` datetime DEFAULT NULL COMMENT '审批时间',
+  `approve_remark` varchar(255) DEFAULT NULL COMMENT '审批意见',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `requisition_no` (`requisition_no`),
+  KEY `idx_department_id` (`department_id`),
+  KEY `idx_applicant_id` (`applicant_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `purchase_requisition`
+--
+
+LOCK TABLES `purchase_requisition` WRITE;
+/*!40000 ALTER TABLE `purchase_requisition` DISABLE KEYS */;
+INSERT INTO `purchase_requisition` VALUES (607162368023077814,'PR20260218-426572658001',4000000000000000001,7000000000000000000,'2026-02-18',48200.00,3,7000000000000000006,'2026-02-19 09:05:34','没钱','2026-02-18 22:56:12','2026-02-19 09:05:34'),(607163998466483126,'PR20260218-427544495001',4000000000000000001,7000000000000000000,'2026-02-18',100.00,1,7000000000000000006,NULL,NULL,'2026-02-18 23:12:24','2026-02-18 23:12:24'),(607164255392768950,'PR20260218-427697639002',4000000000000000001,7000000000000000000,'2026-02-18',100.00,1,7000000000000000006,NULL,NULL,'2026-02-18 23:14:57','2026-02-18 23:14:57'),(6000000000000000001,'PR202501001',4000000000000000007,7000000000000000013,'2025-01-03',45000.00,4,7000000000000000006,'2025-01-03 16:00:00','批准采购，生产急需','2025-01-03 09:00:00','2025-01-05 10:00:00'),(6000000000000000002,'PR202501002',4000000000000000006,7000000000000000011,'2025-01-05',8800.00,4,7000000000000000006,'2025-01-05 17:00:00','批准，补充标准件库存','2025-01-05 10:00:00','2025-01-06 11:00:00'),(6000000000000000003,'PR202501003',4000000000000000007,7000000000000000013,'2025-01-15',93000.00,4,7000000000000000006,'2025-01-15 16:30:00','批准，生产订单需要','2025-01-15 09:30:00','2025-01-16 10:00:00'),(6000000000000000004,'PR202501004',4000000000000000003,7000000000000000005,'2025-01-25',125000.00,2,7000000000000000006,'2025-01-25 17:00:00','批准，固定资产采购','2025-01-25 10:00:00','2026-02-18 21:05:48'),(6000000000000000005,'PR202502001',4000000000000000007,7000000000000000013,'2025-01-30',38400.00,2,7000000000000000006,'2025-01-30 16:00:00','批准','2025-01-30 11:00:00','2025-01-30 16:00:00'),(6000000000000000006,'PR202502002',4000000000000000002,7000000000000000003,'2025-01-31',2500.00,4,7000000000000000006,'2026-02-19 20:31:52','已转换为采购订单','2025-01-31 14:00:00','2026-02-19 20:31:52'),(6000000000000000007,'PR202501005',4000000000000000005,7000000000000000009,'2025-01-20',15000.00,3,7000000000000000006,'2025-01-20 18:00:00','预算不足，延后采购','2025-01-20 13:00:00','2026-02-18 21:05:54');
+/*!40000 ALTER TABLE `purchase_requisition` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `purchase_requisition_detail`
+--
+
+DROP TABLE IF EXISTS `purchase_requisition_detail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `purchase_requisition_detail` (
+  `id` bigint NOT NULL,
+  `requisition_id` bigint NOT NULL COMMENT '采购申请单ID',
+  `product_id` bigint DEFAULT NULL COMMENT '商品ID（可为原材料/生活用品）',
+  `product_name` varchar(100) DEFAULT NULL COMMENT '商品名称',
+  `category_type` tinyint NOT NULL COMMENT '类别：1-生产原料 2-固定资产 3-生活用品',
+  `quantity` decimal(10,2) NOT NULL COMMENT '数量',
+  `unit_price` decimal(12,2) DEFAULT NULL COMMENT '单价',
+  `amount` decimal(12,2) DEFAULT NULL COMMENT '金额',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `purchase_requisition_detail`
+--
+
+LOCK TABLES `purchase_requisition_detail` WRITE;
+/*!40000 ALTER TABLE `purchase_requisition_detail` DISABLE KEYS */;
+INSERT INTO `purchase_requisition_detail` VALUES (607162368023143350,607162368023077814,1100000000000000002,'Q345低合金钢板',1,10.00,4800.00,48000.00,''),(607162368023208886,607162368023077814,0,'',3,10.00,20.00,200.00,''),(607163998466548662,607163998466483126,0,'',1,10.00,10.00,100.00,''),(607164255392834486,607164255392768950,0,'他',1,10.00,10.00,100.00,''),(6100000000000000001,6000000000000000001,1100000000000000001,'Q235碳钢板',1,10.00,4500.00,45000.00,'生产急需'),(6100000000000000002,6000000000000000002,1100000000000000008,'六角螺栓M16*80',1,2000.00,2.50,5000.00,'补充库存'),(6100000000000000003,6000000000000000002,1100000000000000009,'六角螺母M16',1,3000.00,1.20,3600.00,'补充库存'),(6100000000000000004,6000000000000000002,1100000000000000010,'平垫圈16',1,1000.00,0.20,200.00,'补充库存'),(6100000000000000005,6000000000000000003,1100000000000000002,'Q345低合金钢板',1,15.00,4800.00,72000.00,'重型机架生产'),(6100000000000000006,6000000000000000003,1100000000000000005,'角钢',1,5.00,4200.00,21000.00,'框架加强筋'),(6100000000000000007,6000000000000000004,NULL,'数控车床',2,1.00,125000.00,125000.00,'更新设备'),(6100000000000000008,6000000000000000005,1100000000000000002,'Q345低合金钢板',1,8.00,4800.00,38400.00,'月度补充'),(6100000000000000009,6000000000000000006,NULL,'办公用品',3,1.00,2500.00,2500.00,'月度办公用品采购');
+/*!40000 ALTER TABLE `purchase_requisition_detail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping events for database 'erp_purchase'
+--
+
+--
+-- Dumping routines for database 'erp_purchase'
+--
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-04-10 21:53:57

@@ -1,0 +1,20 @@
+Name: hr.rpc
+ListenOn: 0.0.0.0:9003
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: hr.rpc
+DataSource: root:123456@tcp(127.0.0.1:3306)/erp_hr?charset=utf8mb4&parseTime=True&loc=Local
+CacheRedis:
+  - Host: 127.0.0.1:6379
+    Pass:
+    Type: node
+BizRedis:
+  Host: 127.0.0.1:6379
+  Pass:
+  Type: node
+EnablePayrollCron: true
+UserRPC:
+  Etcd:
+    Key: user.rpc
+  NonBlock: true

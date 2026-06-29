@@ -1,0 +1,447 @@
+syntax = "v1"
+
+type (
+	// ------------------------------------
+	// 基础实体定义
+	// ------------------------------------
+	PurchaseRequisition {
+		Id             int64   `json:"id"` // 采购申请ID
+		RequisitionNo  string  `json:"requisitionNo"` // 采购申请单号
+		DepartmentId   int64   `json:"departmentId"` // 申请部门
+		DepartmentName string  `json:"departmentName"` // 部门名称
+		ApplicantId    int64   `json:"applicantId"` // 申请人ID
+		ApplicantNo    string  `json:"applicantNo"` // 申请人工号
+		ApplicantName  string  `json:"applicantName"` // 申请人姓名
+		RequestDate    int64   `json:"requestDate"` // 申请日期
+		TotalAmount    float64 `json:"totalAmount"` // 申请总金额
+		Status         int64   `json:"status"` // 状态：0-草稿 1-待审批 2-已审批 3-已驳回
+		ApproverId     int64   `json:"approverId"` // 审批人ID
+		ApproverNo     string  `json:"approverNo"` // 审批人工号
+		ApproverName   string  `json:"approverName"` // 审批人姓名
+		ApproveTime    int64   `json:"approveTime"` // 审批时间
+		ApproveRemark  string  `json:"approveRemark"` // 审批意见
+		CreatedAt      int64   `json:"createdAt"` // createdAt
+		UpdatedAt      int64   `json:"updatedAt"` // updatedAt
+	}
+	PurchaseRequisitionDetail {
+		Id            int64   `json:"id"` // id
+		RequisitionId int64   `json:"requisitionId"` // 采购申请单ID
+		ProductId     string  `json:"productId"` // 商品ID（可为原材料/生活用品）
+		ProductName   string  `json:"productName"` // 商品名称
+		CategoryType  int64   `json:"categoryType"` // 类别：1-生产原料 2-固定资产 3-生活用品
+		Quantity      float64 `json:"quantity"` // 数量
+		UnitPrice     float64 `json:"unitPrice"` // 单价
+		Amount        float64 `json:"amount"` // 金额
+		Remark        string  `json:"remark"` // 备注
+	}
+	PurchaseOrder {
+		Id            int64   `json:"id"` // 采购订单ID
+		OrderNo       string  `json:"orderNo"` // 采购订单号
+		SupplierId    int64   `json:"supplierId"` // 供应商ID
+		SupplierCode  string  `json:"supplierCode"` // 供应商编码
+		SupplierName  string  `json:"supplierName"` // 供应商名称
+		OrderDate     int64   `json:"orderDate"` // 下单日期
+		ExpectedDate  int64   `json:"expectedDate"` // 期望到货日期
+		TotalAmount   float64 `json:"totalAmount"` // 订单总金额
+		Status        int64   `json:"status"` // 状态：0-草稿 1-已提交 2-已确认 3-部分收货 4-已完成 5-已取消
+		PurchaserId   int64   `json:"purchaserId"` // 采购人ID
+		PurchaserNo   string  `json:"purchaserNo"` // 采购人工号
+		PurchaserName string  `json:"purchaserName"` // 采购人姓名
+		ContractURL   string  `json:"contractUrl"` // 合同URL
+		CreatedAt     int64   `json:"createdAt"` // 创建时间
+		UpdatedAt     int64   `json:"updatedAt"` // 更新时间
+	}
+	PurchaseOrderDetail {
+		Id           int64   `json:"id"` // id
+		OrderId      int64   `json:"orderId"` // 采购订单ID
+		ProductId    string  `json:"productId"` // 商品ID
+		ProductName  string  `json:"productName"` // 商品名称
+		CategoryType int64   `json:"categoryType"` // 类别：1-生产原料 2-固定资产 3-生活用品
+		Quantity     float64 `json:"quantity"` // 采购数量
+		UnitPrice    float64 `json:"unitPrice"` // 采购单价
+		Amount       float64 `json:"amount"` // 金额
+		ReceivedQty  float64 `json:"receivedQty"` // 已收货数量
+		Remark       string  `json:"remark"` // 备注
+	}
+	PurchaseReceipt {
+		Id            int64   `json:"id"` // 入库单ID
+		ReceiptNo     string  `json:"receiptNo"` // 入库单号
+		OrderId       int64   `json:"orderId"` // 关联的采购订单ID
+		WarehouseId   int64   `json:"warehouseId"` // 仓库ID
+		WarehouseNo   string  `json:"warehouseNo"` // 仓库编号
+		WarehouseName string  `json:"warehouseName"` // 仓库名称
+		ReceiptDate   int64   `json:"receiptDate"` // 入库日期
+		TotalQuantity float64 `json:"totalQuantity"` // 总数量
+		TotalAmount   float64 `json:"totalAmount"` // 总金额
+		Status        int64   `json:"status"` // 状态：1-已入库
+		CreatedAt     int64   `json:"createdAt"` // 创建时间
+		CreatedById   int64   `json:"createdById"` // 操作人ID
+		CreatedByNo   string  `json:"createdByNo"` // 操作人工号
+		CreatedByName string  `json:"createdByName"` // 操作人姓名
+	}
+	PurchaseReceiptDetail {
+		Id           int64   `json:"id"` // id
+		ReceiptId    int64   `json:"receiptId"` // 入库单ID
+		ProductId    string  `json:"productId"` // 商品ID
+		ProductName  string  `json:"productName"` // 商品名称
+		CategoryType int64   `json:"categoryType"` // 类别：1-生产原料 2-固定资产 3-生活用品
+		Quantity     float64 `json:"quantity"` // 入库数量
+		UnitPrice    float64 `json:"unitPrice"` // 单价
+		Amount       float64 `json:"amount"` // 金额
+		BatchNo      string  `json:"batchNo"` // 批次号（可选）
+	}
+	// ------------------------------------
+	// 采购申请相关请求/响应
+	// ------------------------------------
+	RequisitionDetailInput {
+		ProductId    string  `json:"productId"` // 商品ID（可为原材料/生活用品）
+		ProductName  string  `json:"productName"` // 商品名称
+		CategoryType int64   `json:"categoryType"` // 类别：1-生产原料 2-固定资产 3-生活用品
+		Quantity     float64 `json:"quantity"` // 数量
+		UnitPrice    float64 `json:"unitPrice,optional"` // 单价（可选，可用于预算）
+		Remark       string  `json:"remark,optional"` // 备注
+	}
+	CreateRequisitionWithDetailsReq {
+		DepartmentId int64                     `json:"departmentId"` // 申请部门
+		ApplicantNo  string                    `json:"applicantNo"` // 申请人（员工工号）
+		ApproverNo   string                    `json:"approverNo"`
+		TotalAmount  float64                   `json:"totalAmount"` // 申请总金额
+		Status       int64                     `json:"status"` // 状态： 1-待审批 2-已审批 3-已驳回
+		Details      []*RequisitionDetailInput `json:"details"` // 明细列表
+	}
+	CreateRequisitionWithDetailsResp {
+		RequisitionId int64 `json:"requisitionId"` // 生成的采购申请ID
+	}
+	ApproveRequisitionReq {
+		RequisitionId int64  `json:"requisitionId"` // 采购申请ID
+		ApproveRemark string `json:"approveRemark"` // 审批意见
+		TargetStatus  int64  `json:"targetStatus"` // 目标状态：2-已审批 3-已驳回
+	}
+	ApproveRequisitionResp  {}
+	GetRequisitionWithDetailsReq {
+		RequisitionId int64 `path:"requisitionId"` // 采购申请ID
+	}
+	GetRequisitionWithDetailsResp {
+		Requisition PurchaseRequisition          `json:"requisition"` // 申请主表
+		Details     []*PurchaseRequisitionDetail `json:"details"` // 申请明细
+	}
+	SearchRequisitionReq {
+		Page          int64  `form:"page"` // 页码
+		Limit         int64  `form:"limit"` // 每页数量
+		RequisitionNo string `form:"requisitionNo,optional"` // 采购申请单号（可选）
+		DepartmentId  int64  `form:"departmentId,optional"` // 申请部门（可选）
+		ApplicantNo   string `form:"applicantNo,optional"` // 申请人（可选）
+		ApproverNo    string `form:"approverNo,optional"` // 审批人（可选）
+		Status        int64  `form:"status,optional"` // 状态（可选）
+	}
+	PurchaseRequisitionWithDetails {
+		Requisition PurchaseRequisition          `json:"requisition"` // 申请主表
+		Total       int64                        `json:"total"`
+		Details     []*PurchaseRequisitionDetail `json:"details"` // 申请明细
+	}
+	SearchRequisitionResp {
+		RequisitionsWithDetails []*PurchaseRequisitionWithDetails `json:"requisitionsWithDetails"` // 申请列表
+		Total                   int64                             `json:"total"` // 总数
+	}
+	UpdateRequisitionReq {
+		Id            int64   `json:"id"` // 采购申请ID
+		DepartmentId  int64   `json:"departmentId,optional"` // 申请部门
+		ApplicantNo   string  `json:"applicantNo,optional"` // 申请人（员工工号）
+		RequestDate   int64   `json:"requestDate,optional"` // 申请日期
+		TotalAmount   float64 `json:"totalAmount,optional"` // 申请总金额
+		Status        int64   `json:"status,optional"` // 状态：0-草稿 1-待审批 2-已审批 3-已驳回
+		ApproverNo    string  `json:"approverNo,optional"` // 审批人
+		ApproveTime   int64   `json:"approveTime,optional"` // 审批时间
+		ApproveRemark string  `json:"approveRemark,optional"` // 审批意见
+	}
+	UpdateRequisitionResp  {}
+	UpdateRequisitionDetailReq {
+		Id           int64   `json:"id"` // 明细ID
+		ProductId    string  `json:"productId,optional"` // 商品ID
+		ProductName  string  `json:"productName,optional"` // 商品名称
+		CategoryType int64   `json:"categoryType,optional"` // 类别：1-生产原料 2-固定资产 3-生活用品
+		Quantity     float64 `json:"quantity,optional"` // 数量
+		UnitPrice    float64 `json:"unitPrice,optional"` // 单价
+		Amount       float64 `json:"amount,optional"` // 金额
+		Remark       string  `json:"remark,optional"` // 备注
+	}
+	UpdateRequisitionDetailResp  {}
+	// ------------------------------------
+	// 采购订单相关请求/响应
+	// ------------------------------------
+	OrderDetailInput {
+		ProductId    string  `json:"productId"` // 商品ID
+		ProductName  string  `json:"productName"` // 商品名称
+		CategoryType int64   `json:"categoryType"` // 类别：1-生产原料 2-固定资产 3-生活用品
+		Quantity     float64 `json:"quantity"` // 采购数量
+		UnitPrice    float64 `json:"unitPrice"` // 采购单价
+		Amount       float64 `json:"amount"` // 金额
+		Remark       string  `json:"remark"` // 备注
+	}
+	CreateOrderFromRequisitionReq {
+		RequisitionId int64               `json:"requisitionId"` // 来源申请ID
+		SupplierId    int64               `json:"supplierId,optional"` // 供应商ID
+		OrderDate     int64               `json:"orderDate,optional"` // 下单日期
+		ExpectedDate  int64               `json:"expectedDate,optional"` // 期望到货日期
+		PurchaserNo   string              `json:"purchaserNo,optional"` // 采购人
+		Details       []*OrderDetailInput `json:"details,optional"` // 订单明细（可选覆盖，如果为空则使用申请的明细）
+	}
+	CreateOrderFromRequisitionResp {
+		OrderId int64 `json:"orderId"` // 生成的采购订单ID
+	}
+	CreateOrderWithDetailsReq {
+		OrderNo      string              `json:"orderNo"` // 采购订单号
+		SupplierId   int64               `json:"supplierId"` // 供应商ID
+		OrderDate    int64               `json:"orderDate"` // 下单日期（时间戳）
+		ExpectedDate int64               `json:"expectedDate"` // 期望到货日期（时间戳）
+		TotalAmount  float64             `json:"totalAmount"` // 订单总金额
+		Status       int64               `json:"status"` // 状态：0-草稿 1-已提交
+		PurchaserNo  string              `json:"purchaserNo"` // 采购人（员工工号）
+		Details      []*OrderDetailInput `json:"details"` // 明细列表
+	}
+	CreateOrderWithDetailsResp {
+		OrderId int64 `json:"orderId"` // 生成的采购订单ID
+	}
+	CancelPurchaseOrderReq {
+		OrderId      int64  `json:"orderId"` // 采购订单ID
+		CancelReason string `json:"cancelReason"` // 取消原因
+	}
+	CancelPurchaseOrderResp  {}
+	GetOrderWithDetailsReq {
+		OrderId int64 `path:"orderId"` // 采购订单ID
+	}
+	GetOrderWithDetailsResp {
+		Order   PurchaseOrder          `json:"order"` // 订单主表
+		Details []*PurchaseOrderDetail `json:"details"` // 订单明细
+	}
+	SearchOrderReq {
+		Page       int64  `form:"page"` // 页码
+		Limit      int64  `form:"limit"` // 每页数量
+		OrderNo    string `form:"orderNo,optional"` // 采购订单号（可选）
+		SupplierId int64  `form:"supplierId,optional"` // 供应商ID（可选）
+		Status     int64  `form:"status,optional"` // 状态（可选）
+	}
+	PurchaseOrderWithDetails {
+		Order   PurchaseOrder          `json:"order"` // 订单主表
+		Total   int64                  `json:"total"`
+		Details []*PurchaseOrderDetail `json:"details"` // 订单明细
+	}
+	SearchOrderResp {
+		OrdersWithDetails []*PurchaseOrderWithDetails `json:"ordersWithDetails"` // 订单列表
+		Total             int64                       `json:"total"` // 总数
+	}
+	UploadContractFileRequest {
+		Id int64 `path:"id"`
+	}
+	UploadContractFileResponse  {}
+	// 更新采购订单请求
+	UpdateOrderReq {
+		Id           int64   `json:"id"` // 采购订单ID
+		SupplierId   int64   `json:"supplierId,optional"` // 供应商ID
+		OrderDate    int64   `json:"orderDate,optional"` // 下单日期
+		ExpectedDate int64   `json:"expectedDate,optional"` // 期望到货日期
+		TotalAmount  float64 `json:"totalAmount,optional"` // 订单总金额
+		Status       int64   `json:"status,optional"` // 状态：0-草稿 1-已提交 2-已确认 3-部分收货 4-已完成 5-已取消
+		PurchaserNo  string  `json:"purchaserNo,optional"` // 采购人（员工工号）
+		ContractURL  string  `json:"contractUrl,optional"` // 合同URL
+	}
+	UpdateOrderResp  {}
+	// 更新采购订单明细请求
+	UpdateOrderDetailReq {
+		Id           int64   `json:"id"` // 明细ID
+		ProductId    string  `json:"productId,optional"` // 商品ID
+		ProductName  string  `json:"productName,optional"` // 商品名称
+		CategoryType int64   `json:"categoryType,optional"` // 类别：1-生产原料 2-固定资产 3-生活用品
+		Quantity     float64 `json:"quantity,optional"` // 采购数量
+		UnitPrice    float64 `json:"unitPrice,optional"` // 采购单价
+		Amount       float64 `json:"amount,optional"` // 金额
+		ReceivedQty  float64 `json:"receivedQty,optional"` // 已收货数量
+		Remark       string  `json:"remark,optional"` // 备注
+	}
+	UpdateOrderDetailResp  {}
+	// ------------------------------------
+	// 采购入库相关请求/响应
+	// ------------------------------------
+	ReceiptDetailInput {
+		ProductId    string  `json:"productId"` // 商品ID
+		ProductName  string  `json:"productName"` // 商品名称
+		CategoryType int64   `json:"categoryType"` // 类别：1-生产原料 2-固定资产 3-生活用品
+		Quantity     float64 `json:"quantity"` // 入库数量
+		UnitPrice    float64 `json:"unitPrice"` // 单价
+		Amount       float64 `json:"amount"` // 金额
+		BatchNo      string  `json:"batchNo,optional"` // 批次号（可选）
+	}
+	CreateReceiptFromOrderReq {
+		OrderId     int64                 `json:"orderId"` // 来源订单ID（系统会从订单中获取明细数据）
+		ReceiptNo   string                `json:"receiptNo"` // 入库单号
+		WarehouseNo string                `json:"warehouseNo"` // 入库仓库
+		ReceiptDate int64                 `json:"receiptDate"` // 入库日期（时间戳）
+		CreatedBy   string                `json:"createdBy"` // 操作人（员工工号）
+		Details     []*ReceiptDetailInput `json:"details,optional"` // 入库明细（可选覆盖，如果为空则使用订单的未收货明细）
+	}
+	CreateReceiptFromOrderResp {
+		ReceiptId int64 `json:"receiptId"` // 生成的入库单ID
+	}
+	CreateReceiptWithDetailsReq {
+		ReceiptNo     string                `json:"receiptNo"` // 入库单号
+		OrderId       int64                 `json:"orderId,optional"` // 关联的采购订单ID（可选，如果有关联）
+		WarehouseNo   string                `json:"warehouseNo"` // 入库仓库
+		ReceiptDate   int64                 `json:"receiptDate"` // 入库日期（时间戳）
+		TotalQuantity float64               `json:"totalQuantity"` // 总数量
+		TotalAmount   float64               `json:"totalAmount"` // 总金额
+		Status        int64                 `json:"status"` // 状态：1-已入库
+		CreatedBy     string                `json:"createdBy"` // 操作人（员工工号）
+		Details       []*ReceiptDetailInput `json:"details"` // 明细列表
+	}
+	CreateReceiptWithDetailsResp {
+		ReceiptId int64 `json:"receiptId"` // 生成的入库单ID
+	}
+	GetReceiptWithDetailsReq {
+		ReceiptId int64 `path:"receiptId"` // 入库单ID
+	}
+	GetReceiptWithDetailsResp {
+		Receipt PurchaseReceipt          `json:"receipt"` // 入库单主表
+		Details []*PurchaseReceiptDetail `json:"details"` // 入库明细
+	}
+	SearchReceiptReq {
+		Page        int64  `form:"page"` // 页码
+		Limit       int64  `form:"limit"` // 每页数量
+		ReceiptNo   string `form:"receiptNo,optional"` // 入库单号（可选）
+		OrderId     int64  `form:"orderId,optional"` // 关联的采购订单ID（可选）
+		WarehouseNo string `form:"warehouseNo,optional"` // 入库仓库（可选）
+	}
+	PurchaseReceiptWithDetails {
+		Receipt PurchaseReceipt          `json:"receipt"` // 入库单主表
+		Total   int64                    `json:"total"`
+		Details []*PurchaseReceiptDetail `json:"details"` // 入库明细
+	}
+	SearchReceiptResp {
+		ReceiptsWithDetails []*PurchaseReceiptWithDetails `json:"receiptsWithDetails"` // 入库单列表
+		Total               int64                         `json:"total"` // 总数
+	}
+	// 更新采购入库单请求
+	UpdateReceiptReq {
+		Id            int64   `json:"id"` // 入库单ID
+		OrderId       int64   `json:"orderId,optional"` // 关联的采购订单ID
+		WarehouseNo   string  `json:"warehouseNo,optional"` // 入库仓库
+		ReceiptDate   int64   `json:"receiptDate,optional"` // 入库日期
+		TotalQuantity float64 `json:"totalQuantity,optional"` // 总数量
+		TotalAmount   float64 `json:"totalAmount,optional"` // 总金额
+		Status        int64   `json:"status,optional"` // 状态：1-已入库
+		CreatedByNo   string  `json:"createdByNo,optional"` // 操作人
+	}
+	UpdateReceiptResp  {}
+	// 更新采购入库明细请求
+	UpdateReceiptDetailReq {
+		Id           int64   `json:"id"` // 明细ID
+		ProductId    string  `json:"productId,optional"` // 商品ID
+		ProductName  string  `json:"productName,optional"` // 商品名称
+		CategoryType int64   `json:"categoryType,optional"` // 类别：1-生产原料 2-固定资产 3-生活用品
+		Quantity     float64 `json:"quantity,optional"` // 入库数量
+		UnitPrice    float64 `json:"unitPrice,optional"` // 单价
+		Amount       float64 `json:"amount,optional"` // 金额
+		BatchNo      string  `json:"batchNo,optional"` // 批次号（可选）
+	}
+	UpdateReceiptDetailResp  {}
+)
+
+@server (
+	group:      purchaseRequisition
+	prefix:     /api/v1/purchase/requisition
+	middleware: AuthMiddleware
+)
+service purchase-api {
+	// 创建采购申请及明细（事务）
+	@handler CreateRequisitionWithDetails
+	post / (CreateRequisitionWithDetailsReq) returns (CreateRequisitionWithDetailsResp)
+
+	// 审批采购申请
+	@handler ApproveRequisition
+	post /approve (ApproveRequisitionReq) returns (ApproveRequisitionResp)
+
+	// 获取采购申请及明细
+	@handler GetRequisitionWithDetails
+	get /:requisitionId (GetRequisitionWithDetailsReq) returns (GetRequisitionWithDetailsResp)
+
+	// 查询采购申请
+	@handler SearchRequisition
+	get /search (SearchRequisitionReq) returns (SearchRequisitionResp)
+
+	// 更新采购申请
+	@handler UpdateRequisition
+	put / (UpdateRequisitionReq) returns (UpdateRequisitionResp)
+
+	// 更新采购申请明细
+	@handler UpdateRequisitionDetail
+	put /detail (UpdateRequisitionDetailReq) returns (UpdateRequisitionDetailResp)
+}
+
+@server (
+	group:      purchaseOrder
+	prefix:     /api/v1/purchase/order
+	middleware: AuthMiddleware
+)
+service purchase-api {
+	// 从采购申请创建采购订单（通过 requisition_id 获取申请明细数据，保证一致性）
+	@handler CreateOrderFromRequisition
+	post /createFromRequisition (CreateOrderFromRequisitionReq) returns (CreateOrderFromRequisitionResp)
+
+	// 直接创建采购订单及明细（事务）
+	@handler CreateOrderWithDetails
+	post / (CreateOrderWithDetailsReq) returns (CreateOrderWithDetailsResp)
+
+	// 取消采购订单
+	@handler CancelPurchaseOrder
+	post /cancel (CancelPurchaseOrderReq) returns (CancelPurchaseOrderResp)
+
+	// 获取采购订单及明细
+	@handler GetOrderWithDetails
+	get /:orderId (GetOrderWithDetailsReq) returns (GetOrderWithDetailsResp)
+
+	// 查询采购订单
+	@handler SearchOrder
+	get /search (SearchOrderReq) returns (SearchOrderResp)
+
+	@handler UploadContractFile
+	post /upload/:id (UploadContractFileRequest) returns (UploadContractFileResponse)
+
+	// 更新采购订单
+	@handler UpdateOrder
+	put / (UpdateOrderReq) returns (UpdateOrderResp)
+
+	// 更新采购订单明细
+	@handler UpdateOrderDetail
+	put /detail (UpdateOrderDetailReq) returns (UpdateOrderDetailResp)
+}
+
+@server (
+	group:      purchaseReceipt
+	prefix:     /api/v1/purchase/receipt
+	middleware: AuthMiddleware
+)
+service purchase-api {
+	// 从采购订单创建入库单（通过 order_id 获取订单明细数据，保证一致性）
+	@handler CreateReceiptFromOrder
+	post /createFromOrder (CreateReceiptFromOrderReq) returns (CreateReceiptFromOrderResp)
+
+	// 直接创建入库单及明细（事务）
+	@handler CreateReceiptWithDetails
+	post /create (CreateReceiptWithDetailsReq) returns (CreateReceiptWithDetailsResp)
+
+	// 获取入库单及明细
+	@handler GetReceiptWithDetails
+	get /:receiptId (GetReceiptWithDetailsReq) returns (GetReceiptWithDetailsResp)
+
+	// 查询入库单
+	@handler SearchReceipt
+	get /search (SearchReceiptReq) returns (SearchReceiptResp)
+
+	// 更新采购入库单
+	@handler UpdateReceipt
+	put / (UpdateReceiptReq) returns (UpdateReceiptResp)
+
+	// 更新采购入库明细
+	@handler UpdateReceiptDetail
+	put /detail (UpdateReceiptDetailReq) returns (UpdateReceiptDetailResp)
+}
+

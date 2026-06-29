@@ -1,0 +1,22 @@
+Name: auth-api
+Host: 0.0.0.0
+Port: 8001
+
+Auth:
+  AccessSecret: qsHUADZu9izXb8-rRl8SeSuZBYdoO
+  # 20分钟
+  #  AccessExpire: 1200
+  AccessExpire: 604800
+
+AuthRPC:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: auth.rpc
+  NonBlock: true
+
+
+BizRedis:
+  Host: 127.0.0.1:6379
+  Pass:
+  Type: node

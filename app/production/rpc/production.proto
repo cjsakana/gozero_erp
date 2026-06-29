@@ -1,0 +1,300 @@
+syntax = "proto3";
+
+package production;
+option go_package = "./production";
+
+// 生产服务
+service Production {
+  // BOM管理
+  rpc CreateBom(CreateBomReq) returns (CreateBomResp);
+  rpc UpdateBom(UpdateBomReq) returns (UpdateBomResp);
+  rpc DeleteBom(IdReq) returns (EmptyResp);
+  rpc GetBom(IdReq) returns (BomInfo);
+  rpc GetBomList(BomListReq) returns (BomListResp);
+
+  // BOM明细管理
+  rpc CreateBomItem(CreateBomItemReq) returns (CreateBomItemResp);
+  rpc UpdateBomItem(UpdateBomItemReq) returns (UpdateBomItemResp);
+  rpc DeleteBomItem(IdReq) returns (EmptyResp);
+
+  // 生产工单管理
+  rpc CreateWorkOrder(CreateWorkOrderReq) returns (CreateWorkOrderResp);
+  rpc UpdateWorkOrder(UpdateWorkOrderReq) returns (UpdateWorkOrderResp);
+  rpc DeleteWorkOrder(IdReq) returns (EmptyResp);
+  rpc GetWorkOrder(IdReq) returns (WorkOrderInfo);
+  rpc GetWorkOrderList(WorkOrderListReq) returns (WorkOrderListResp);
+
+  // 领料单管理
+  rpc CreateRequisition(CreateRequisitionReq) returns (CreateRequisitionResp);
+  rpc UpdateRequisition(UpdateRequisitionReq) returns (UpdateRequisitionResp);
+  rpc GetRequisition(IdReq) returns (RequisitionInfo);
+  rpc GetRequisitionList(RequisitionListReq) returns (RequisitionListResp);
+  rpc ApproveRequisition(ApproveRequisitionReq) returns (ApproveRequisitionResp);
+
+  // 领料单明细管理
+  rpc CreateRequisitionItem(CreateRequisitionItemReq) returns (CreateRequisitionItemResp);
+  rpc UpdateRequisitionItem(UpdateRequisitionItemReq) returns (UpdateRequisitionItemResp);
+  rpc DeleteRequisitionItem(IdReq) returns (EmptyResp);
+}
+
+message IdReq{
+  int64 id = 1;
+}
+message EmptyResp{}
+
+
+// ========== BOM物料清单 ==========
+message BomInfo {
+  int64 id = 1;
+  string bom_no = 2;
+  int64 product_id = 3;
+  string product_name = 4;
+  string version = 5;
+  double unit_cost = 6;
+  int64 is_active = 7;
+  string remark = 8;
+  int64 created_at = 9;
+  int64 created_by = 10;
+  int64 updated_at = 11;
+  int64 updated_by = 12;
+  repeated BomItemInfo items = 13;
+}
+
+message BomItemInfo {
+  int64 id = 1;
+  int64 bom_id = 2;
+  int64 material_id = 3;
+  string material_name = 4;
+  double quantity = 5;
+  string unit = 6;
+  double scrap_rate = 7;
+  string remark = 8;
+}
+
+message CreateBomReq {
+  int64 product_id = 1;
+  string product_name = 2;
+  string version = 3;
+  string remark = 4;
+  int64 created_by = 5;
+}
+message CreateBomResp {
+  int64 id = 1;
+}
+
+message UpdateBomReq {
+  int64 id = 1;
+  string version = 2;
+  int64 is_active = 3;
+  string remark = 4;
+  int64 updated_by = 5;
+}
+message UpdateBomResp{}
+
+
+message BomListReq {
+  int64 page = 1;
+  int64 page_size = 2;
+  int64 product_id = 3;
+  int64 is_active = 4;
+}
+
+message BomListResp {
+  int64 total = 1;
+  repeated BomInfo list = 2;
+}
+
+// BOM明细增删改
+message CreateBomItemReq {
+  int64 bom_id = 1;
+  int64 material_id = 2;
+  string material_name = 3;
+  double quantity = 4;
+  string unit = 5;
+  double scrap_rate = 6;
+  string remark = 7;
+}
+message CreateBomItemResp {
+  int64 id = 1;
+}
+
+message UpdateBomItemReq {
+  int64 id = 1;
+  int64 material_id = 2;
+  double quantity = 3;
+  string unit = 4;
+  double scrap_rate = 5;
+  string remark = 6;
+}
+message UpdateBomItemResp {}
+
+// ========== 生产工单 ==========
+message WorkOrderInfo {
+  int64 id = 1;
+  string order_no = 2;
+  int64 product_id = 3;
+  string product_name = 4;
+  int64 bom_id = 5;
+  double quantity = 6;
+  double completed_qty = 7;
+  double qualified_qty = 8;
+  double defective_qty = 9;
+  int64 warehouse_id = 10;
+  int64 status = 12;
+  int64 priority = 13;
+  int64  plan_start_date = 14;
+  int64  plan_end_date = 15;
+  int64  actual_start_date = 16;
+  int64  actual_end_date = 17;
+  string workshop = 18;
+  string remark = 19;
+  int64 created_at = 20;
+  int64 created_by = 21;
+  int64 updated_at = 22;
+  int64 updated_by = 23;
+  string bomVersion = 24;
+}
+
+message CreateWorkOrderReq {
+  int64 product_id = 1;
+  int64 bom_id = 2;
+  double quantity = 3;
+  int64 warehouse_id = 4;
+  int64 priority = 5;
+  int64  plan_start_date = 6;
+  int64  plan_end_date = 7;
+  string workshop = 8;
+  string remark = 9;
+  int64 created_by = 10;
+  string product_name=11;
+}
+message CreateWorkOrderResp {
+  int64 id=1;
+}
+
+message UpdateWorkOrderReq {
+  int64 id = 1;
+  double quantity = 2;
+  double completed_qty = 3;
+  double qualified_qty = 4;
+  double defective_qty = 5;
+  int64 status = 6;
+  int64 priority = 7;
+  int64  plan_start_date = 8;
+  int64  plan_end_date = 9;
+  int64  actual_start_date = 10;
+  int64  actual_end_date = 11;
+  string workshop = 12;
+  string remark = 13;
+  int64 updated_by = 14;
+}
+message UpdateWorkOrderResp {}
+
+message WorkOrderListReq {
+  int64 page = 1;
+  int64 page_size = 2;
+  int64 product_id = 3;
+  int64 status = 4;
+  int64 priority = 5;
+  int64 start_date = 6;
+  int64 end_date = 7;
+}
+
+message WorkOrderListResp {
+  int64 total = 1;
+  repeated WorkOrderInfo list = 2;
+}
+
+// ========== 领料单 ==========
+message RequisitionInfo {
+  int64 id = 1;
+  string requisition_no = 2;
+  int64 work_order_id = 3;
+  string work_order_no = 4;
+  int64 warehouse_id = 5;
+  int64 requisition_date = 7;
+  int64 status = 8;
+  int64 approved_by = 9;
+  int64 approved_at = 10;
+  int64 created_at = 11;
+  int64 created_by = 12;
+  int64 updated_at = 13;
+  int64 updated_by = 14;
+  repeated RequisitionItemInfo items = 15;
+}
+
+message RequisitionItemInfo {
+  int64 id = 1;
+  int64 requisition_id = 2;
+  int64 material_id = 3;
+  string material_name = 4;
+  double plan_quantity = 5;
+  double actual_quantity = 6;
+  string unit = 7;
+  string batch_no = 8;
+  string remark = 9;
+}
+
+message CreateRequisitionReq {
+  int64 work_order_id = 1;
+  int64 warehouse_id = 2;
+  int64 requisition_date = 3;
+  int64 approved_by = 4;
+  int64 created_by = 5;
+}
+message CreateRequisitionResp {
+  int64 id=1;
+}
+
+message UpdateRequisitionReq {
+  int64 id = 1;
+  int64 status = 2;
+  int64 updated_by = 3;
+}
+message UpdateRequisitionResp {}
+
+message ApproveRequisitionReq {
+  int64 id = 1;
+  int64 status = 2;  // 2-已审批 3-已驳回
+  int64 approver_id = 3;
+}
+message ApproveRequisitionResp {}
+
+message RequisitionListReq {
+  int64 page = 1;
+  int64 page_size = 2;
+  int64 work_order_id = 3;
+  int64 warehouse_id = 4;
+  int64 status = 5;
+}
+
+message RequisitionListResp {
+  int64 total = 1;
+  repeated RequisitionInfo list = 2;
+}
+
+// 领料单明细增删改
+message CreateRequisitionItemReq {
+  int64 requisition_id = 1;
+  int64 material_id = 2;
+  string material_name = 3;
+  double plan_quantity = 4;
+  double actual_quantity = 5;
+  string unit = 6;
+  string batch_no = 7;
+  string remark = 8;
+}
+message CreateRequisitionItemResp {
+  int64 id = 1;
+}
+
+message UpdateRequisitionItemReq {
+  int64 id = 1;
+  int64 material_id = 2;
+  double plan_quantity = 3;
+  double actual_quantity = 4;
+  string unit = 5;
+  string batch_no = 6;
+  string remark = 7;
+}
+message UpdateRequisitionItemResp {}
