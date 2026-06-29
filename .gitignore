@@ -5,4 +5,4 @@
 **/*.api
 **/*.bat
 doc/*
-./deploy/script
+deploy/script
